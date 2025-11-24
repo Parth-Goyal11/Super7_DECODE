@@ -44,7 +44,7 @@ public class BasicDriveTest extends Base {
         ElapsedTime reset = new ElapsedTime();
         boolean canReset = false;
         boolean indexerFlipped = false;
-        double powerCap = 0.5;
+        double powerCap = 1;
         boolean shooterOn = false;
 
 

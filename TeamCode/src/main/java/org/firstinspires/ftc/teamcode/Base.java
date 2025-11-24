@@ -187,7 +187,7 @@ public abstract class Base extends LinearOpMode{
             double turnConstant,
             double movementD,
             double turnD,
-            double timeout) {
+            double timeout, double powerCap) {
         ElapsedTime time = new ElapsedTime();
         resetCache();
         odo.update();
@@ -298,7 +298,7 @@ public abstract class Base extends LinearOpMode{
             //driveFieldCentric(-yPow, -turnPow, xPow);
             telemetry.addData("target: ", destPt);
             telemetry.update();
-            driveFieldCentric(xPow, -turnPow, -yPow, 1);
+            driveFieldCentric(-xPow, turnPow, yPow, powerCap);
 
         }
         stopDrive();
@@ -502,8 +502,8 @@ public abstract class Base extends LinearOpMode{
                                               double turnConstant,
                                               double movementD,
                                               double turnD,
-                                              double timeout) {
-        ChaseTheCarrot(wp, switchTolerance, skip, false, false, heading, error, angleError, normalMovementConstant, finalMovementConstant, turnConstant, movementD, turnD, timeout);
+                                              double timeout, double powerCap) {
+        ChaseTheCarrot(wp, switchTolerance, skip, false, false, heading, error, angleError, normalMovementConstant, finalMovementConstant, turnConstant, movementD, turnD, timeout, powerCap);
     }
 
 
