@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,6 +16,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Core.Angle;
 import org.firstinspires.ftc.teamcode.Core.Motor;
 import org.firstinspires.ftc.teamcode.Core.Point;
+import org.firstinspires.ftc.teamcode.Modules.Indexer;
+import org.firstinspires.ftc.teamcode.Modules.Intake;
+import org.firstinspires.ftc.teamcode.Modules.Shooter;
+import org.firstinspires.ftc.teamcode.Modules.Turret;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +29,11 @@ public abstract class Base extends LinearOpMode{
     public List<LynxModule> allHubs;
     public Motor fLeft, bLeft, fRight, bRight;
 
-    public Motor shooterOne, shooterTwo, sweeper;
-    CRServo wheelOne, wheelTwo;
-    Servo indexer, spin, kick, stop, angleLeft, angleRight;
+    public Motor shooterOne, shooterTwo, frontSweeper, backSweeper;
+    CRServo rotOne, rotTwo;
+    Servo kickerOne, kickerTwo, kickerThree;
+
+    RevColorSensorV3 slotOne, slotTwo, slotThree;
     public final double X_POD_OFFSET = -1;
     public final double Y_POD_OFFSET = -7.5;
 
@@ -60,31 +67,21 @@ public abstract class Base extends LinearOpMode{
 
 
 
-        //Module Motors
-//        shooterOne = new Motor(hardwareMap, "shooterOne");
-//        shooterTwo = new Motor(hardwareMap, "shooterTwo");
-//        sweeper = new Motor(hardwareMap, "sweeper");
-//
-//        shooterOne.useEncoder();
-//        shooterTwo.useEncoder();
-//
-//
-//        wheelOne = hardwareMap.get(CRServo.class, "wheelOne");
-//        wheelTwo = hardwareMap.get(CRServo.class, "wheelTwo");
-//        indexer = hardwareMap.get(Servo.class, "indexer");
-//        spin = hardwareMap.get(Servo.class, "spin");
-//        kick = hardwareMap.get(Servo.class, "kicker");
-//        stop = hardwareMap.get(Servo.class, "stop");
-//
-//        angleLeft = hardwareMap.get(Servo.class, "angleLeft");
-//        angleRight = hardwareMap.get(Servo.class, "angleRight");
-//        angleLeft.setPosition(0.7478);
-//        angleRight.setPosition(0.2339);
-//        indexer.setPosition(0);
-////        spin.setPosition(0.097);//Lower
-//        kick.setPosition(0.63);
-//        stop.setPosition(0.453);
-        //Instantiate Odometry
+        shooterOne = new Motor(hardwareMap, "shooterOne");
+        shooterTwo = new Motor(hardwareMap, "shooterTwo");
+
+        frontSweeper = new Motor(hardwareMap, "frontSweeper");
+        backSweeper = new Motor(hardwareMap, "backSweeper");
+
+        rotOne = hardwareMap.get(CRServo.class, "rotOne");
+        rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
+
+
+        //Initialize Modules
+        Shooter shooter = new Shooter(shooterOne, shooterTwo);
+        Turret turret = new Turret(rotOne, rotTwo);
+        Intake intake = new Intake(frontSweeper, backSweeper);
+
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 
         odo.setOffsets(3.5, 2.6, DistanceUnit.INCH);
@@ -97,60 +94,6 @@ public abstract class Base extends LinearOpMode{
 
     }
 
-//    public void moveToPosition(double targetX, double targetY, double targetAngle, double MOE, double angleMOE, double maxTime){
-//        ElapsedTime timer = new ElapsedTime();
-//        double xErr = 200, yErr = 200, angleErr = 200;
-//        resetCache();
-//        double previousX = 0, previousY = 0, previousTheta = 0;
-//        double previousTime = 0;
-//        while (timer.milliseconds() <= maxTime &&
-//                (Math.abs(xErr) >= MOE || Math.abs(yErr) >= MOE || Math.abs(angleErr) >= MOE)) {
-//
-//            odo.update();
-//            Pose2D pos = odo.getPosition();
-//            resetCache();
-//
-//            double kp = 0.055;
-//            double kd = 0.03;
-//            double currentTime = timer.milliseconds();
-//
-//            xErr = targetX - pos.getX(DistanceUnit.INCH);
-//            yErr = targetY - pos.getY(DistanceUnit.INCH);
-//            angleErr = targetAngle - pos.getHeading(AngleUnit.DEGREES);
-//
-//            double anglePow = 0.01 * angleErr;
-//
-//
-//            double xP = kp * xErr;
-//            double yP = kp * yErr;
-//            double aP = 0.01 * angleErr;
-//
-//
-//            double xD = kd * (xErr - previousX) / (currentTime - previousTime);
-//            double yD =  kd * (yErr - previousY) / (currentTime - previousTime);
-//            double aD = kd * (angleErr - previousTheta) / (currentTime - previousTime);
-//
-//            double xPow = xP ;
-//            double yPow = yP ;
-//            double aPow = aP;
-//
-//
-//
-//            driveFieldCentric(-xPow, aPow, yPow, 0.15);
-//
-//            previousX = xErr;
-//            previousY = yErr;
-//            previousTheta = angleErr;
-//            previousTime = currentTime;
-//            telemetry.addData("Angle Error", angleErr);
-//            telemetry.addData("X Error", xErr);
-//            telemetry.addData("Y Error", yErr);
-//            telemetry.update();
-//
-//        }
-//        setDrivePowers(0, 0, 0,0, 1);
-//
-//    }
 
     //Position Getters
 
