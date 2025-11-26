@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -34,6 +35,8 @@ public abstract class Base extends LinearOpMode{
     Servo kickerOne, kickerTwo, kickerThree;
 
     RevColorSensorV3 slotOne, slotTwo, slotThree;
+    AnalogInput turretTrack;
+
     public final double X_POD_OFFSET = -1;
     public final double Y_POD_OFFSET = -7.5;
 
@@ -52,9 +55,9 @@ public abstract class Base extends LinearOpMode{
 
 
         //Drive Motors
-         fLeft = new Motor(hardwareMap, "fLeft");
-       fRight = new Motor(hardwareMap, "fRight");
-      bLeft = new Motor(hardwareMap, "bLeft");
+        fLeft = new Motor(hardwareMap, "fLeft");
+        fRight = new Motor(hardwareMap, "fRight");
+        bLeft = new Motor(hardwareMap, "bLeft");
         bRight = new Motor(hardwareMap, "bRight");
 
         fLeft.noEncoder();
@@ -71,16 +74,15 @@ public abstract class Base extends LinearOpMode{
         shooterTwo = new Motor(hardwareMap, "shooterTwo");
 
         frontSweeper = new Motor(hardwareMap, "frontSweeper");
-        backSweeper = new Motor(hardwareMap, "backSweeper");
+//        backSweeper = new Motor(hardwareMap, "backSweeper");
 
         rotOne = hardwareMap.get(CRServo.class, "rotOne");
         rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
+        turretTrack = hardwareMap.get(AnalogInput.class, "turretTrack");
 
 
         //Initialize Modules
-        Shooter shooter = new Shooter(shooterOne, shooterTwo);
-        Turret turret = new Turret(rotOne, rotTwo);
-        Intake intake = new Intake(frontSweeper, backSweeper);
+
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 

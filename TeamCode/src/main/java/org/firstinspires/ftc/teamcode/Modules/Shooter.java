@@ -37,4 +37,8 @@ public class Shooter {
         shooterOne.setPower(0);
         shooterTwo.setPower(0);
     }
+
+    public double getVelocity(){
+        return shooterOne.retMotorEx().getVelocity();
+    }
 }

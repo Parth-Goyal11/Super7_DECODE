@@ -27,6 +27,36 @@ public class Turret {
         this.rotateTwo = rotateTwo;
     }
 
+    public Turret(CRServo rotateOne, CRServo rotateTwo, AnalogInput rotOneEncoder){
+        this.rotateOne = rotateOne;
+        this.rotateTwo = rotateTwo;
+
+        this.rotOneEncoder = rotOneEncoder;
+    }
+
+    public void rotate(){
+        rotateOne.setPower(1);
+        rotateTwo.setPower(1);
+    }
+
+    public void rotateReverse(){
+        rotateOne.setPower(-1);
+        rotateTwo.setPower(-1);
+    }
+
+    public void stop(){
+        rotateOne.setPower(0);
+        rotateTwo.setPower(0);
+    }
+
+    public double getDegree(){
+        double clipped = rotOneEncoder.getVoltage() / 3.3;
+        return clipped * 360;
+    }
+
+
+
+
 
 
 

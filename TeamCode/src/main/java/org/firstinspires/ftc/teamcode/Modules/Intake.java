@@ -10,6 +10,10 @@ public class Intake {
         this.backSweep = backSweep;
     }
 
+    public Intake(Motor frontSweep){
+        this.frontSweep = frontSweep;
+    }
+
     public void intakeBoth(){
         frontSweep.setPower(1);
         backSweep.setPower(1);
@@ -17,6 +21,10 @@ public class Intake {
 
     public void intakeFront(){
         frontSweep.setPower(1);
+    }
+
+    public void intakeOutFront(){
+        frontSweep.setPower(-1);
     }
 
     public void intakeBack(){
