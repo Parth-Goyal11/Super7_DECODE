@@ -73,6 +73,9 @@ public abstract class Base extends LinearOpMode{
         shooterOne = new Motor(hardwareMap, "shooterOne");
         shooterTwo = new Motor(hardwareMap, "shooterTwo");
 
+        shooterOne.noEncoder();
+        shooterTwo.noEncoder();
+
         frontSweeper = new Motor(hardwareMap, "frontSweeper");
 //        backSweeper = new Motor(hardwareMap, "backSweeper");
 
@@ -80,7 +83,8 @@ public abstract class Base extends LinearOpMode{
         rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
         turretTrack = hardwareMap.get(AnalogInput.class, "turretTrack");
 
-
+        kickerOne = hardwareMap.servo.get("kickerOne");
+        kickerTwo = hardwareMap.servo.get("kickerTwo");
         //Initialize Modules
 
 
@@ -449,6 +453,11 @@ public abstract class Base extends LinearOpMode{
                                               double turnD,
                                               double timeout, double powerCap) {
         ChaseTheCarrot(wp, switchTolerance, skip, false, false, heading, error, angleError, normalMovementConstant, finalMovementConstant, turnConstant, movementD, turnD, timeout, powerCap);
+    }
+
+    public void ChaseTheCarrotConstantHeading(ArrayList<Point> wp, double heading, double timeout, double powerCap){
+
+        ChaseTheCarrot(wp, 9, 3, false, false, heading,3, 1,  0.05, 0.05, 0.03, 0.0005, 0, timeout, powerCap);
     }
 
 

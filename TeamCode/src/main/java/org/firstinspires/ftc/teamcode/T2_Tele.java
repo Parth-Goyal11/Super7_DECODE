@@ -14,6 +14,7 @@ public class T2_Tele extends Base{
         Shooter shooter = new Shooter(shooterOne, shooterTwo);
         Intake intake = new Intake(frontSweeper);
         Turret turret = new Turret(rotOne, rotTwo, turretTrack);
+        Indexer indexer = new Indexer(kickerOne, kickerTwo);
 
         //Status Booleans
         boolean shooterOn = false;
@@ -21,6 +22,7 @@ public class T2_Tele extends Base{
         //Op-Mode Values
         double targetVelocity = 1350;
         double powerCap = 0.9;
+        final double TRIGGER_THRESHOLD = 0.05;
 
         //Button Variables
         boolean shooterLast = false, shooterCurr = false;
@@ -52,9 +54,9 @@ public class T2_Tele extends Base{
             }
 
             //Intake Control
-            if(gamepad1.right_trigger > 0.05){
+            if(gamepad1.right_trigger > TRIGGER_THRESHOLD){
                 intake.intakeFront();
-            }else if(gamepad1.left_trigger > 0.05){
+            }else if(gamepad1.left_trigger > TRIGGER_THRESHOLD){
                 intake.intakeOutFront();
             }else{
                 intake.stopFront();
@@ -65,6 +67,16 @@ public class T2_Tele extends Base{
             shooterCurr = gamepad1.left_bumper;
             if(shooterCurr && !shooterLast){
                 shooterOn = !shooterOn;
+            }
+
+
+
+            if(gamepad1.a){
+                indexer.actuateKickerOne();
+            }
+
+            if(gamepad1.b){
+                indexer.actuateKickerTwo();
             }
 
 

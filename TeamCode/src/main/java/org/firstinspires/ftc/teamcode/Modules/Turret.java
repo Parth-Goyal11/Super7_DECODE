@@ -17,9 +17,6 @@ public class Turret {
 
         this.rotOneEncoder = rotOneEncoder;
         this.rotTwoEncoder = rotTwoEncoder;
-
-
-
     }
 
     public Turret(CRServo rotateOne, CRServo rotateTwo){

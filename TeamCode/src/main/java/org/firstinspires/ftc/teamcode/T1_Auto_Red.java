@@ -58,23 +58,26 @@ public class T1_Auto_Red extends Base{
 
         ChaseTheCarrotConstantHeading(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.8);
         sleep(500);
+
         firstIntake = PathGenerator.interpSplinePath(firstIntake, new Point(getX(), getY(), 0));
-
-
         ChaseTheCarrotConstantHeading(firstIntake, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 3000, 0.9);
         sleep(500);
+
         ChaseTheCarrotConstantHeading(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.9);
         sleep(500);
+
         secondIntake = PathGenerator.interpSplinePath(secondIntake, new Point(getX(), getY(), 0));
         ChaseTheCarrotConstantHeading(secondIntake, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 3000, 0.9);
         sleep(500);
+
         ChaseTheCarrotConstantHeading(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.8);
         sleep(500);
 
         thirdIntake = PathGenerator.interpSplinePath(thirdIntake, new Point(getX(), getY(), 0));
         ChaseTheCarrotConstantHeading(thirdIntake, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 3000, 0.9);
-
         sleep(500);
+
+
         ChaseTheCarrotConstantHeading(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.9);
         sleep(500);
 

@@ -17,6 +17,8 @@ public class Indexer {
 
     Servo[] kickers;
 
+    double kickerOneUp = 0.2, kickerOneDown = 0.9, kickerTwoUp = 0.8, kickerTwoDown = 0;
+
 
     public Indexer(RevColorSensorV3 slotOne, RevColorSensorV3 slotTwo, RevColorSensorV3 slotThree, Servo kickerOne, Servo kickerTwo, Servo kickerThree, String[] order, ElapsedTime timer){
         this.slotOne = slotOne;
@@ -31,6 +33,17 @@ public class Indexer {
 
         this.order = order;
         this.timer = timer;
+    }
+
+    public Indexer(Servo kickerOne, Servo kickerTwo, Servo kickerThree){
+        this.kickerOne = kickerOne;
+        this.kickerTwo = kickerTwo;
+        this.kickerThree = kickerThree;
+    }
+
+    public Indexer(Servo kickerOne, Servo kickerTwo){
+        this.kickerOne = kickerOne;
+        this.kickerTwo = kickerTwo;
     }
 
     public String [] getReadings(){
@@ -87,6 +100,18 @@ public class Indexer {
         }else{
             return "Empty";
         }
+    }
+
+    public void actuateKickerOne() throws InterruptedException {
+        kickerOne.setPosition(kickerOneUp);
+        sleep(300);
+        kickerOne.setPosition(kickerOneDown);
+    }
+
+    public void actuateKickerTwo() throws InterruptedException {
+        kickerTwo.setPosition(kickerTwoUp);
+        sleep(300);
+        kickerTwo.setPosition(kickerTwoDown);
     }
 
 
