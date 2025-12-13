@@ -132,6 +132,9 @@ public class BasicDriveTest extends Base {
         hoodOne.setPosition(0.5);
         hoodTwo.setPosition(0.5);
 
+        rotOne.setPosition(0.75);
+        rotTwo.setPosition(0.75);
+
         odo.setHeading(179, AngleUnit.DEGREES);
 
         telemetry.addData("Status", "Initialized");
@@ -261,7 +264,7 @@ public class BasicDriveTest extends Base {
             }
 
             if (timerThree.milliseconds() > 290 && kickThree) {
-                kickers[2].setPosition(KICKER_TWO_DOWN);
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
                 kickThree = false;
                 kickTimerThree.reset();
                 bruhKickThree = true;
@@ -314,9 +317,10 @@ public class BasicDriveTest extends Base {
                 targetVelocity -= 25;
             }
 
-            double turrDrive = gamepad2.left_stick_x;
-            rotOne.setPower(-turrDrive * 0.7);
-            rotTwo.setPower(-turrDrive * 0.7);
+//            double turrDrive = gamepad2.left_stick_x;
+//
+//            rotOne.setPower(-turrDrive * 0.7);
+//            rotTwo.setPower(-turrDrive * 0.7);
 
 
             if(gamepad2.right_bumper){

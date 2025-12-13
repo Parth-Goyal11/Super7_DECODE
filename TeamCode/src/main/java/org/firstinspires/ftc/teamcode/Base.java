@@ -31,7 +31,7 @@ public abstract class Base extends LinearOpMode{
     public Motor fLeft, bLeft, fRight, bRight;
 
     public Motor shooterOne, shooterTwo, frontSweeper, backSweeper;
-    CRServo rotOne, rotTwo;
+    Servo rotOne, rotTwo;
     Servo kickerOne, kickerTwo, kickerThree;
     Servo hoodOne, hoodTwo;
     RevColorSensorV3 slotOne, slotTwo, slotThree;
@@ -101,8 +101,10 @@ public abstract class Base extends LinearOpMode{
         backSweeper.noEncoder();
 //        backSweeper = new Motor(hardwareMap, "backSweeper");
 
-        rotOne = hardwareMap.get(CRServo.class, "rotOne");
-        rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
+//        rotOne = hardwareMap.get(CRServo.class, "rotOne");
+//        rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
+         rotOne = hardwareMap.servo.get("rotOne");
+         rotTwo = hardwareMap.servo.get("rotTwo");
 
 //        hoodOne = hardwareMap.servo.get("hoodOne");
 //        hoodTwo = hardwareMap.servo.get("hoodTwo");

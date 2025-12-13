@@ -13,7 +13,7 @@ public class T2_Tele extends Base{
         //Robot Modules
         Shooter shooter = new Shooter(shooterOne, shooterTwo);
         Intake intake = new Intake(frontSweeper);
-        Turret turret = new Turret(rotOne, rotTwo, turretTrack);
+//        Turret turret = new Turret(rotOne, rotTwo, turretTrack);
         Indexer indexer = new Indexer(kickerOne, kickerTwo);
 
         //Status Booleans
@@ -45,13 +45,13 @@ public class T2_Tele extends Base{
             }
 
             //Manual Turret Control
-            if(gamepad1.dpad_left){
-                turret.rotate();
-            }else if(gamepad1.dpad_right){
-                turret.rotateReverse();
-            }else{
-                turret.stop();
-            }
+//            if(gamepad1.dpad_left){
+//                turret.rotate();
+//            }else if(gamepad1.dpad_right){
+//                turret.rotateReverse();
+//            }else{
+//                turret.stop();
+//            }
 
             //Intake Control
             if(gamepad1.right_trigger > TRIGGER_THRESHOLD){
@@ -81,7 +81,7 @@ public class T2_Tele extends Base{
 
 
             telemetry.addData("Shooter Velocity", shooter.getVelocity());
-            telemetry.addData("Turret Position", turret.getDegree());
+//            telemetry.addData("Turret Position", turret.getDegree());
             telemetry.update();
 
         }
