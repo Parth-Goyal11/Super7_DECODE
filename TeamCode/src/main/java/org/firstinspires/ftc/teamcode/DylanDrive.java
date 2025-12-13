@@ -9,33 +9,28 @@ import org.firstinspires.ftc.teamcode.Core.Motor;
 
 @TeleOp(name="Dylan Drive")
 public class DylanDrive extends LinearOpMode {
-    Motor fLeft, fRight, bLeft, bRight;
+
+    Motor fLeft, fRight, bRight, bLeft;
 
     @Override
     public void runOpMode() throws InterruptedException {
         fLeft = new Motor(hardwareMap, "leftOne");
-        bLeft = new Motor(hardwareMap, "leftTwo");
         fRight = new Motor(hardwareMap, "rightOne");
+        bLeft = new Motor(hardwareMap, "leftTwo");
         bRight = new Motor(hardwareMap, "rightTwo");
 
-        RevColorSensorV3 colorSensor = hardwareMap.get(RevColorSensorV3.class, "color");
-
-        fRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        bRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
         while(opModeIsActive()){
-            double powOne = -gamepad1.left_stick_y;
-            double powTwo = -gamepad1.right_stick_y;
+            double driveLeft = -gamepad1.left_stick_y;
+            double driveRight = gamepad1.right_stick_y;
 
-            fLeft.setPower(powOne);
-            bLeft.setPower(powOne);
+            fLeft.setPower(driveLeft);
+            bLeft.setPower(driveLeft);
 
-            fRight.setPower(powTwo);
-            bRight.setPower(powTwo);
-
-            colorSensor.getNormalizedColors();
+            fRight.setPower(driveRight);
+            bRight.setPower(driveRight);
         }
     }
 }

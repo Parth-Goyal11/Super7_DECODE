@@ -33,12 +33,22 @@ public abstract class Base extends LinearOpMode{
     public Motor shooterOne, shooterTwo, frontSweeper, backSweeper;
     CRServo rotOne, rotTwo;
     Servo kickerOne, kickerTwo, kickerThree;
-
+    Servo hoodOne, hoodTwo;
     RevColorSensorV3 slotOne, slotTwo, slotThree;
     AnalogInput turretTrack;
 
+    public static double kv = 0.000543;
+
+    public static double kp = 0.015;
+    public static double ki = 0;
+    public static double kd = 0;
+    public static double targetVelocity = 1400;
+
     public final double X_POD_OFFSET = -1;
     public final double Y_POD_OFFSET = -7.5;
+
+    double TPS;
+    double error;
 
     GoBildaPinpointDriver odo;
 
@@ -69,28 +79,42 @@ public abstract class Base extends LinearOpMode{
         fLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
-
         shooterOne = new Motor(hardwareMap, "shooterOne");
         shooterTwo = new Motor(hardwareMap, "shooterTwo");
-
         shooterOne.noEncoder();
         shooterTwo.noEncoder();
 
-        frontSweeper = new Motor(hardwareMap, "frontSweeper");
+
+
+
+
+
+//        shooterOne.noEncoder();
+//        shooterTwo.noEncoder();
+
+//        shooterOne.noEncoder();
+//        shooterTwo.noEncoder();
+
+        frontSweeper = new Motor(hardwareMap, "intake");
+        frontSweeper.noEncoder();
+        backSweeper = new Motor(hardwareMap, "doubleIntake");
+        backSweeper.noEncoder();
 //        backSweeper = new Motor(hardwareMap, "backSweeper");
 
         rotOne = hardwareMap.get(CRServo.class, "rotOne");
         rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
-        turretTrack = hardwareMap.get(AnalogInput.class, "turretTrack");
 
-        kickerOne = hardwareMap.servo.get("kickerOne");
-        kickerTwo = hardwareMap.servo.get("kickerTwo");
+//        hoodOne = hardwareMap.servo.get("hoodOne");
+//        hoodTwo = hardwareMap.servo.get("hoodTwo");
+//        turretTrack = hardwareMap.get(AnalogInput.class, "turretTrack");
+
+
         //Initialize Modules
 
 
-        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo"); //2.75, 1.75
 
-        odo.setOffsets(3.5, 2.6, DistanceUnit.INCH);
+        odo.setOffsets(-1.75, 2.75, DistanceUnit.INCH);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.resetPosAndIMU();
@@ -120,6 +144,138 @@ public abstract class Base extends LinearOpMode{
         Pose2D pos = odo.getPosition();
         double angle = pos.getHeading(AngleUnit.DEGREES);
         return angle;
+    }
+    public void ChaseTheCarrotWithShooter(
+            ArrayList<Point> wp,
+            int switchTolerance,
+            int skip,
+            boolean followSplineHeading,
+            boolean invertSplineHeading,
+            double heading,
+            double error,
+            double angleError,
+            double normalMovementConstant,
+            double finalMovementConstant,
+            double turnConstant,
+            double movementD,
+            double turnD,
+            double timeout, double powerCap, double shooterVelocity) {
+        ElapsedTime time = new ElapsedTime();
+        resetCache();
+        odo.update();
+        Pose2D pos = odo.getPosition();
+
+
+        double xDiff = Integer.MAX_VALUE, yDiff = Integer.MAX_VALUE, angleDiff = Integer.MAX_VALUE, prevTime = 0, prevXDiff = 0, prevYDiff = 0, prevAngleDiff = 0, splineHeading = 0, maxSpeed = 1;
+        double finalSplineHeading = Angle.normalize(Math.toDegrees(Math.atan2(wp.get(wp.size() - 1).yP, wp.get(wp.size() - 1).xP)));
+        int pt = 0;
+        time.reset();
+        while ((pt < wp.size() - 1
+                || (Math.abs(pos.getX(DistanceUnit.INCH) - wp.get(wp.size() - 1).xP) > error
+                || Math.abs(pos.getY(DistanceUnit.INCH) - wp.get(wp.size() - 1).yP) > error
+                || ( followSplineHeading ?  ( invertSplineHeading ? Math.abs(Angle.normalize(finalSplineHeading - (-Angle.normalize(180 - getAngle())))) > angleError :
+                Math.abs(Angle.normalize(finalSplineHeading - getAngle())) > angleError)
+                : (heading == Double.MAX_VALUE
+                ? Math.abs(angleDiff) > 0
+                : Math.abs(Angle.normalize(heading - getAngle())) > angleError) )))
+
+                && time.milliseconds() < timeout && opModeIsActive()) {
+
+            odo.update();
+            pos = odo.getPosition();
+
+
+            runShooter(targetVelocity);
+            resetCache();
+
+
+            double x = pos.getX(DistanceUnit.INCH);
+            double y = pos.getY(DistanceUnit.INCH);
+            double theta = pos.getHeading(AngleUnit.DEGREES);
+
+
+            if (getRobotDistanceFromPoint(wp.get(pt)) <= switchTolerance && pt != wp.size() - 1) {
+                odo.update();
+
+                resetCache();
+                pt = Math.min(wp.size()-1, pt+skip);
+            }
+
+            Point destPt = wp.get(pt);
+            xDiff = destPt.xP - x;
+            yDiff = destPt.yP - y;
+            splineHeading = Angle.normalize(Math.toDegrees(Math.atan2(yDiff, xDiff)));
+            maxSpeed = destPt.speed;
+
+            if(followSplineHeading) {
+                if(pt == wp.size() - 1){
+                    if(invertSplineHeading){
+                        angleDiff = Angle.normalize(finalSplineHeading - (-Angle.normalize(180 - getAngle())));
+                    }else {
+                        angleDiff = Angle.normalize(finalSplineHeading - theta);
+                    }
+                }else {
+                    if(invertSplineHeading){
+                        angleDiff = Angle.normalize(splineHeading - (-Angle.normalize(180 - getAngle())));
+                    }else {
+                        angleDiff = Angle.normalize(splineHeading - theta);
+                    }
+                }
+            }else{
+                if(heading == Double.MAX_VALUE){
+                    if(wp.get(pt).invertSpline){
+                        if(pt == wp.size() - 1){
+                            angleDiff = Angle.normalize(finalSplineHeading - (-Angle.normalize(180 - getAngle())));
+                        }else {
+                            angleDiff = Angle.normalize(splineHeading - (-Angle.normalize(180 - getAngle())));
+                        }
+                    }else if(wp.get(pt).spline){
+                        if(pt == wp.size() - 1){
+                            angleDiff = Angle.normalize(finalSplineHeading - theta);
+                        }else {
+                            angleDiff = Angle.normalize(splineHeading - theta);
+                        }
+                    }else{
+                        angleDiff = Angle.normalize(wp.get(wp.size() - 1).ang - theta);
+                    }
+                }else{
+                    angleDiff = Angle.normalize(heading - theta);
+                }
+            }
+
+            double xPow=0, yPow=0, turnPow=0;
+
+            turnPow += angleDiff * turnConstant;
+            if (pt == wp.size() - 1) {
+                xPow += xDiff * finalMovementConstant;
+                yPow += yDiff * finalMovementConstant;
+                xPow += movementD * (xDiff - prevXDiff) / (time.seconds() - prevTime);
+                yPow += movementD * (yDiff - prevYDiff) / (time.seconds() - prevTime);
+                turnPow += turnD * (angleDiff - prevAngleDiff) / (time.seconds() - prevTime);
+                System.out.println((movementD * (xDiff - prevXDiff) / (time.seconds() - prevTime)));
+            } else {
+                xPow += xDiff * normalMovementConstant;
+                yPow += yDiff * normalMovementConstant;
+            }
+
+            turnPow = Range.clip(turnPow, -1, 1);
+            xPow = Range.clip(xPow, -maxSpeed, maxSpeed);
+            yPow = Range.clip(yPow, -maxSpeed, maxSpeed);
+            System.out.println(maxSpeed);
+
+
+            prevTime = time.seconds();
+            prevXDiff = xDiff;
+            prevYDiff = yDiff;
+            prevAngleDiff = angleDiff;
+
+            //driveFieldCentric(-yPow, -turnPow, xPow);
+            telemetry.addData("target: ", destPt);
+            telemetry.update();
+            driveFieldCentric(-xPow, turnPow, yPow, powerCap);
+
+        }
+        stopDrive();
     }
 
     public void ChaseTheCarrot(
@@ -162,7 +318,9 @@ public abstract class Base extends LinearOpMode{
             pos = odo.getPosition();
 
 
+
             resetCache();
+
 
             double x = pos.getX(DistanceUnit.INCH);
             double y = pos.getY(DistanceUnit.INCH);
@@ -422,6 +580,22 @@ public abstract class Base extends LinearOpMode{
         bRight.setPower(0);
     }
 
+    public void runShooter(double targetVelocity){
+        TPS = shooterOne.retMotorEx().getVelocity();
+
+        error = targetVelocity - shooterOne.retMotorEx().getVelocity();
+
+        double p = kp * error;
+        double feedforward = kv * targetVelocity;
+
+        double pow = p + feedforward;
+
+        double finalPow = Range.clip(pow, -1, 1);
+
+        shooterOne.setPower(finalPow);
+        shooterTwo.setPower(-finalPow);
+    }
+
     public double normalizeAngle(double rawAngle) {
         double scaledAngle = rawAngle % 360;
         if (scaledAngle < 0) {
@@ -453,6 +627,21 @@ public abstract class Base extends LinearOpMode{
                                               double turnD,
                                               double timeout, double powerCap) {
         ChaseTheCarrot(wp, switchTolerance, skip, false, false, heading, error, angleError, normalMovementConstant, finalMovementConstant, turnConstant, movementD, turnD, timeout, powerCap);
+    }
+
+    public void ChaseTheCarrotConstantHeadingWithShooter(ArrayList<Point> wp,
+                                              int switchTolerance,
+                                              int skip,
+                                              double heading,
+                                              double error,
+                                              double angleError,
+                                              double normalMovementConstant,
+                                              double finalMovementConstant,
+                                              double turnConstant,
+                                              double movementD,
+                                              double turnD,
+                                              double timeout, double powerCap) {
+        ChaseTheCarrotWithShooter(wp, switchTolerance, skip, false, false, heading, error, angleError, normalMovementConstant, finalMovementConstant, turnConstant, movementD, turnD, timeout, powerCap, 1020);
     }
 
     public void ChaseTheCarrotConstantHeading(ArrayList<Point> wp, double heading, double timeout, double powerCap){

@@ -10,37 +10,50 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Core.Motor;
 
 @Config
-@TeleOp(name="Shooter Test")
+@TeleOp(name="Test Shooting")
 public class DriveMotorConfig extends LinearOpMode {
     public static double kv = 0.000543;
 
     public static double kp = 0.015;
     public static double ki = 0;
     public static double kd = 0;
-    public static double targetVelocity = 1350;
+    public static double targetVelocity = 1400;
 
+    boolean upLast = false, upCurr = false;
+    boolean downLast = false, downCurr = false;
     FtcDashboard dashboard;
 
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotorEx shooter, shooterTwo;
 
+
+
+        boolean triggerOneLast = false, triggerOneCurr = false, triggerTwoLast = false, triggerTwoCurr = false,
+                triggerThreeLast = false, triggerThreeCurr = false;
+        double KICKER_ONE_DOWN = 0.1372, KICKER_ONE_UP = 0.6583, KICKER_TWO_DOWN = 0.88, KICKER_TWO_UP = 0.6122,
+                KICKER_THREE_DOWN = 0.625, KICKER_THREE_UP = 0.89;
+
         shooter = hardwareMap.get(DcMotorEx.class, "shooterOne");
         shooterTwo = hardwareMap.get(DcMotorEx.class, "shooterTwo");
 
-        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooterTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        shooterTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Servo angleLeft, angleRight;
+//        Servo angleLeft, angleRight;
+//
+//        angleLeft = hardwareMap.servo.get( "angleLeft");
+//        angleRight = hardwareMap.servo.get("angleRight");
+//
+//        kickerOne.setPosition(KICKER_ONE_DOWN);
+//        kickerTwo.setPosition(KICKER_TWO_DOWN);
+//        kickerThree.setPosition(KICKER_THREE_DOWN);
 
-        angleLeft = hardwareMap.servo.get( "angleLeft");
-        angleRight = hardwareMap.servo.get("angleRight");
 
-        angleLeft.setPosition(0.7478);
-        angleRight.setPosition(0.2339);
 
 
 
@@ -53,6 +66,7 @@ public class DriveMotorConfig extends LinearOpMode {
        boolean shooterMode = false;
        double TPS = 0;
        double error = 0;
+       double power = 0;
 
        dashboard = FtcDashboard.getInstance();
        Telemetry dashboardTelemetry = dashboard.getTelemetry();
@@ -81,28 +95,41 @@ public class DriveMotorConfig extends LinearOpMode {
 
                shooter.setPower(pow);
                shooterTwo.setPower(-pow);
+               power = pow;
+
            }else{
                shooter.setPower(0);
                shooterTwo.setPower(0);
+               power = 0;
            }
 
-           if(gamepad1.dpad_up){
-               angleLeft.setPosition(angleLeft.getPosition() + 0.002);
-               angleRight.setPosition(angleRight.getPosition() - 0.002);
-           }else if(gamepad1.dpad_down){
-               angleLeft.setPosition(angleLeft.getPosition() - 0.002);
-               angleRight.setPosition(angleRight.getPosition() + 0.002);
+           downLast = downCurr;
+           downCurr = gamepad1.dpad_down;
+           if(downCurr && !downLast){
+               targetVelocity -= 50;
+           }
+
+           upLast = upCurr;
+           upCurr = gamepad1.dpad_up;
+           if(upCurr && !upLast){
+               targetVelocity += 50;
            }
 
 
-           dashboardTelemetry.addData("Shooter Velo", TPS);
+
+
+
+
+           dashboardTelemetry.addData("Shooter Velo", shooter.getVelocity());
+           telemetry.addData("Motor Current", shooter.getCurrent(CurrentUnit.MILLIAMPS));
            dashboardTelemetry.addData("Target Velocity", targetVelocity);
            dashboardTelemetry.addData("Error", error);
+           telemetry.addData("Pow", power);
+           telemetry.update();
            dashboardTelemetry.update();
 
-           telemetry.addData("Angle Left", angleLeft.getPosition());
-           telemetry.addData("Angle Right", angleRight.getPosition());
-           telemetry.update();
+
+
 
 
 

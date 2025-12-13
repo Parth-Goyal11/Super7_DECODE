@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.Core.Motor;
 @TeleOp(name="Color Detection")
 public class EncoderDirectionTest extends LinearOpMode {
     CRServo rotOne, rotTwo;
+    Servo kickerOne, kickerTwo, kickerThree;
 
 
     @Override
@@ -24,14 +25,18 @@ public class EncoderDirectionTest extends LinearOpMode {
         double kd = 0;
         double targetVelocity = 1350;
 
+        kickerOne = hardwareMap.servo.get("kickIntake");
+        kickerTwo = hardwareMap.servo.get("kickOut");
+        kickerThree = hardwareMap.servo.get("kickMiddle");
+
 //        rotOne = hardwareMap.get(CRServo.class, "rotOne");
 //        rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
 //
 //        AnalogInput firstAnalog = hardwareMap.get(AnalogInput.class, "firstTurret");
 //        boolean yuhLast = false, yuhCurr = false;
         boolean incLast = false, incCurr = false;
-        Servo kickerOne = hardwareMap.servo.get("kickerOne");
-        Servo kickerTwo = hardwareMap.servo.get("kickerTwo");
+
+
 
         CRServo rotOne = hardwareMap.get(CRServo.class, "rotOne");
         CRServo rotTwo = hardwareMap.get(CRServo.class, "rotTwo");
@@ -40,10 +45,16 @@ public class EncoderDirectionTest extends LinearOpMode {
         Motor shooterTwo = new Motor(hardwareMap, "shooterTwo");
         boolean shooterMode = false;
 
+        boolean triggerOneLast = false, triggerOneCurr = false, triggerTwoLast = false, triggerTwoCurr = false,
+                triggerThreeLast = false, triggerThreeCurr = false;
+        double KICKER_ONE_DOWN = 0.1372, KICKER_ONE_UP = 0.6583, KICKER_TWO_DOWN = 0.875, KICKER_TWO_UP = 0.6122,
+                KICKER_THREE_DOWN = 0.625, KICKER_THREE_UP = 0.89;
+
 
         String status = "";
-        kickerOne.setPosition(0.9);
-        kickerTwo.setPosition(0);
+        kickerOne.setPosition(KICKER_ONE_DOWN);
+        kickerTwo.setPosition(KICKER_TWO_DOWN);
+        kickerThree.setPosition(KICKER_THREE_DOWN);
 
 
         double conversionConstant = (60.0)/(28.0);
@@ -57,18 +68,30 @@ public class EncoderDirectionTest extends LinearOpMode {
 
         while(opModeIsActive()){
 
-            if(gamepad1.a){
-                kickerOne.setPosition(0.2);
-                sleep(300);
-                kickerOne.setPosition(0.9);
+            triggerOneLast = triggerOneCurr;
+            triggerOneCurr = gamepad1.a;
+            if(triggerOneCurr && !triggerOneLast){
+                kickerOne.setPosition(KICKER_ONE_UP);
+                sleep(500);
+                kickerOne.setPosition(KICKER_ONE_DOWN);
             }
 
-            if(gamepad1.b){
-                kickerTwo.setPosition(0.8);
-                sleep(300);
-                kickerTwo.setPosition(0);
+            triggerTwoLast = triggerTwoCurr;
+            triggerTwoCurr = gamepad1.b;   //Shoot this one last as it gets kind of stuck
+            if(triggerTwoCurr && !triggerTwoLast){
+                kickerTwo.setPosition(KICKER_TWO_UP);
+                sleep(500);
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
             }
 
+
+            triggerThreeLast = triggerThreeCurr;
+            triggerThreeCurr = gamepad1.x;
+            if(triggerThreeCurr && !triggerThreeLast){
+                kickerThree.setPosition(KICKER_THREE_UP);
+                sleep(500);
+                kickerThree.setPosition(KICKER_THREE_DOWN);
+            }
 
 
             if(gamepad1.left_trigger > 0.05){
@@ -96,16 +119,6 @@ public class EncoderDirectionTest extends LinearOpMode {
                 shooterTwo.setPower(0);
             }
 
-            if(gamepad1.dpad_left){
-                rotOne.setPower(1);
-                rotTwo.setPower(1);
-            }else if(gamepad1.dpad_right){
-                rotOne.setPower(-1);
-                rotTwo.setPower(-1);
-            }else{
-                rotOne.setPower(0);
-                rotTwo.setPower(0);
-            }
 
 
 
@@ -114,8 +127,9 @@ public class EncoderDirectionTest extends LinearOpMode {
 
 
 
-            telemetry.addData("Kicker One", kickerOne.getPosition());
-            telemetry.addData("Kicker Two", kickerTwo.getPosition());
+
+
+
             telemetry.update();
 
         }
