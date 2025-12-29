@@ -598,6 +598,18 @@ public abstract class Base extends LinearOpMode{
         shooterTwo.setPower(-finalPow);
     }
 
+    public double flywheelRegression(double distance){
+        double power = 5 * distance;
+
+        return power;
+    }
+
+    public double hoodRegression(double distance){
+        double angle = 5 * distance;
+
+        return angle;
+    }
+
     public double normalizeAngle(double rawAngle) {
         double scaledAngle = rawAngle % 360;
         if (scaledAngle < 0) {

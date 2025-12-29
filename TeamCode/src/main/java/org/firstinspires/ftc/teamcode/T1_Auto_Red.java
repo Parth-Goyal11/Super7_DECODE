@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Autonomous(name="Red Auto")
 public class T1_Auto_Red extends Base{
-    ArrayList<Point> shot1, firstIntake, gate, secondIntake, thirdIntake;
+    ArrayList<Point> shot1, firstIntake, gate, secondIntake, thirdIntake, park;
     @Override
     public void runOpMode() throws InterruptedException {
         boolean kickThree = true;
@@ -62,16 +62,26 @@ public class T1_Auto_Red extends Base{
         kickerOne.setPosition(KICKER_ONE_DOWN);
         kickerTwo.setPosition(KICKER_TWO_DOWN);
         kickerThree.setPosition(KICKER_THREE_DOWN);
+        rotOne.setPosition(0.07);
+        rotTwo.setPosition(0.07);
 
         shot1 = new ArrayList<>();
         shot1.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-38, -32, 0, 0.8)
+                                new Point(-29, -36, 0, 0.8)
                         )
                 )
         );
 
+        park = new ArrayList<>();
+        park.addAll(
+                new ArrayList<>(
+                        Arrays.asList(
+                                new Point(-29, -20, 0, 0.8)
+                        )
+                )
+        );
         firstIntake = new ArrayList<>();
         firstIntake.addAll(
                 new ArrayList<>(
@@ -97,7 +107,7 @@ public class T1_Auto_Red extends Base{
                 new ArrayList<>(
                         Arrays.asList(
                                 new Point(-20, -71.5, 0, 0.8),
-                                new Point(19, -71.5, 0, 0.3)
+                                new Point(20, -71.5, 0, 0.3)
                         )
                 )
         );
@@ -122,14 +132,14 @@ public class T1_Auto_Red extends Base{
 
 
 
-        hoodOne.setPosition(0.25);
-        hoodTwo.setPosition(0.75);
+        hoodOne.setPosition(0.75);
+        hoodTwo.setPosition(0.25);
 
         ;
         ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.8);
 
         timerOne.reset();
-        while(timerOne.milliseconds() < 1250){
+        while(timerOne.milliseconds() < 1300){
 
             resetCache();
 
@@ -164,7 +174,7 @@ public class T1_Auto_Red extends Base{
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1180 && loop6){
+            if(timerOne.milliseconds() > 1280 && loop6){
                 kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
@@ -184,7 +194,7 @@ public class T1_Auto_Red extends Base{
 //        kickerTwo.setPosition(KICKER_TWO_DOWN);
 
         frontSweeper.setPower(-0.95);
-//        backSweeper.setPower(-0.95);
+        backSweeper.setPower(-0.95);
         shooterOne.setPower(0);
         shooterTwo.setPower(0);
 
@@ -198,7 +208,7 @@ public class T1_Auto_Red extends Base{
 
         gate = PathGenerator.interpSplinePath(gate, new Point(getX(), getY(), 0));
         ChaseTheCarrotConstantHeading(gate, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 1100, 0.9);
-        sleep(250);
+        sleep(550);
 
 
 
@@ -209,43 +219,43 @@ public class T1_Auto_Red extends Base{
 
 
         timerOne.reset();
-        while(timerOne.milliseconds() < 1290){
+        while(timerOne.milliseconds() < 1300){
 
             resetCache();
 
             runShooter(1020);
             if(kickThree){
-                kickerOne.setPosition(KICKER_ONE_UP);
+                kickerThree.setPosition(KICKER_THREE_UP);
                 kickThree = false;
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 290 && loop2){
-                kickerOne.setPosition(KICKER_ONE_DOWN);
+            if(timerOne.milliseconds() > 310 && loop2){
+                kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
             }
 
             if(timerOne.milliseconds() > 490 && loop3){
-                kickerTwo.setPosition(KICKER_TWO_UP);
+                kickerOne.setPosition(KICKER_ONE_UP);
                 loop3 = false;
                 loop4 = true;
             }
 
             if(timerOne.milliseconds() > 780 && loop4){
-                kickerTwo.setPosition(KICKER_TWO_DOWN);
+                kickerOne.setPosition(KICKER_ONE_DOWN);
                 loop4 = false;
                 loop5 = true;
             }
 
             if(timerOne.milliseconds() > 980 && loop5){
-                kickerThree.setPosition(KICKER_THREE_UP);
+                kickerTwo.setPosition(KICKER_TWO_UP);
                 loop5 = false;
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1250 && loop6){
-                kickerThree.setPosition(KICKER_THREE_DOWN);
+            if(timerOne.milliseconds() > 1280 && loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
         }
@@ -271,19 +281,19 @@ public class T1_Auto_Red extends Base{
         ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.8);
 
         timerOne.reset();
-        while(timerOne.milliseconds() < 1290){
+        while(timerOne.milliseconds() < 1300){
 
             resetCache();
 
             runShooter(1020);
             if(kickThree){
-                kickerTwo.setPosition(KICKER_TWO_UP);
+                kickerThree.setPosition(KICKER_THREE_UP);
                 kickThree = false;
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 290 && loop2){
-                kickerTwo.setPosition(KICKER_TWO_DOWN);
+            if(timerOne.milliseconds() > 310 && loop2){
+                kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
             }
@@ -301,13 +311,13 @@ public class T1_Auto_Red extends Base{
             }
 
             if(timerOne.milliseconds() > 980 && loop5){
-                kickerThree.setPosition(KICKER_THREE_UP);
+                kickerTwo.setPosition(KICKER_TWO_UP);
                 loop5 = false;
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1250 && loop6){
-                kickerThree.setPosition(KICKER_THREE_DOWN);
+            if(timerOne.milliseconds() > 1280 && loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
         }
@@ -317,6 +327,7 @@ public class T1_Auto_Red extends Base{
 
 
         frontSweeper.setPower(-0.95);
+        backSweeper.setPower(-0.95);
 
 
         thirdIntake = PathGenerator.interpSplinePath(thirdIntake, new Point(getX(), getY(), 0));
@@ -324,6 +335,7 @@ public class T1_Auto_Red extends Base{
         sleep(500);
 
         frontSweeper.setPower(0);
+        backSweeper.setPower(0);
 
 
 
@@ -331,7 +343,7 @@ public class T1_Auto_Red extends Base{
         ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.9);
 
         timerOne.reset();
-        while(timerOne.milliseconds() < 1250){
+        while(timerOne.milliseconds() < 1300){
 
             resetCache();
 
@@ -342,7 +354,7 @@ public class T1_Auto_Red extends Base{
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 290 && loop2){
+            if(timerOne.milliseconds() > 310 && loop2){
                 kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
@@ -366,13 +378,18 @@ public class T1_Auto_Red extends Base{
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1180 && loop6){
+            if(timerOne.milliseconds() > 1280 && loop6){
                 kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
         }
         kickThree = true;
 
+        shooterOne.setPower(0);
+        shooterTwo.setPower(0);
+        ChaseTheCarrotConstantHeadingWithShooter(park, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.9);
+
+        sleep(500);
 
 
 
