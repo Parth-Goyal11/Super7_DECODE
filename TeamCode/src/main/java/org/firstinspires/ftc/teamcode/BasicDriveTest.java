@@ -296,21 +296,21 @@ public class BasicDriveTest extends Base {
                 timerOne.reset();
             }
 
-            if (timerOne.milliseconds() > 290 && kickOne) {
+            if (timerOne.milliseconds() > 165 && kickOne) {
                 kickerThree.setPosition(KICKER_THREE_DOWN);
                 kickOne = false;
                 kickTimer.reset();
                 bruhKick = true;
             }
 
-            if (kickTimer.milliseconds() > 200 && bruhKick) {
+            if (kickTimer.milliseconds() > 45 && bruhKick) {
                 kickerOne.setPosition(KICKER_ONE_UP);
                 kickTwo = true;
                 bruhKick = false;
                 timerTwo.reset();
             }
 
-            if (timerTwo.milliseconds() > 290 && kickTwo) {
+            if (timerTwo.milliseconds() > 165 && kickTwo) {
                 kickerOne.setPosition(KICKER_ONE_DOWN);
                 kickTwo = false;
                 kickerTimerTwo.reset();
@@ -318,7 +318,7 @@ public class BasicDriveTest extends Base {
 
             }
 
-            if (kickerTimerTwo.milliseconds() > 200 && bruhKickTwo) {
+            if (kickerTimerTwo.milliseconds() > 45 && bruhKickTwo) {
                 kickerTwo.setPosition(KICKER_TWO_UP);
                 kickThree = true;
                 bruhKickTwo = false;
