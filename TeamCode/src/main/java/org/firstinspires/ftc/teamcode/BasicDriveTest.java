@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -23,8 +24,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-
-@TeleOp(name="Red Teleop T2")
+@Disabled
+@TeleOp(name="League Champs Red Tele")
 public class BasicDriveTest extends Base {
 
 
@@ -44,12 +45,17 @@ public class BasicDriveTest extends Base {
         String[] order2 = {"purple", "green", "purple"};
         String[] order3 = {"purple", "purple", "green"};
         ElapsedTime loopTime = new ElapsedTime();
-        double kv = 0.00057;
+        double kv = 0.0004;
 
-        double kp = 0.018;
+        double kp = 0.021;
         double ki = 0;
         double kd = 0;
-        double targetVelocity = 1150;
+        double targetVelocity = 1750;
+
+
+
+
+
         resetCache();
 
 
@@ -59,14 +65,9 @@ public class BasicDriveTest extends Base {
 
 
 
-        kickerOne = hardwareMap.servo.get("kickIntake");
-        kickerTwo = hardwareMap.servo.get("kickOut");
-        kickerThree = hardwareMap.servo.get("kickMiddle");
 
 
-        RevColorSensorV3 slotIntake = hardwareMap.get(RevColorSensorV3.class, "colorIn");
-        RevColorSensorV3 slotOut = hardwareMap.get(RevColorSensorV3.class, "colorOut");
-        RevColorSensorV3 finalColor = hardwareMap.get(RevColorSensorV3.class, "colorLast");
+
 
 
         hoodOne = hardwareMap.servo.get("hoodOne");
@@ -77,8 +78,8 @@ public class BasicDriveTest extends Base {
 
         boolean triggerOneLast = false, triggerOneCurr = false, triggerTwoLast = false, triggerTwoCurr = false,
                 triggerThreeLast = false, triggerThreeCurr = false, triggerFourCurr = false, triggerFourLast = false;
-        double KICKER_ONE_DOWN = 0.15, KICKER_ONE_UP = 0.634, KICKER_TWO_DOWN = 0.6, KICKER_TWO_UP = 0.3,
-                KICKER_THREE_DOWN = 0.638, KICKER_THREE_UP = 0.91;
+        double KICKER_ONE_DOWN = 0.95, KICKER_ONE_UP = 0.6, KICKER_TWO_DOWN = 0.985, KICKER_TWO_UP = 0.7,
+                KICKER_THREE_DOWN = 0.06, KICKER_THREE_UP = 1;
 
         boolean toggleVeloLast = false, toggleVeloCurr = false;
         boolean minusVeloLast = false, minusVeloCurr = false;
@@ -92,6 +93,8 @@ public class BasicDriveTest extends Base {
         boolean shoot = false;
         boolean intake = false;
         boolean canPush = false;
+        boolean oneShot = false, twoShot = false, threeShot = false;
+        boolean oneKick = false, twoKick = false, threeKick = false;
         ElapsedTime pushBall = new ElapsedTime();
         ElapsedTime reset = new ElapsedTime();
         boolean canReset = false;
@@ -104,7 +107,9 @@ public class BasicDriveTest extends Base {
         double error = 0;
         boolean kickOne = false, kickTwo = false, kickThree = false;
         boolean bruhKick = false, bruhKickTwo = false, bruhKickThree = false;
-        String oneSlot = "", twoSlot = "", threeSlot ="";
+        boolean resetLast = false, resetCurr = false;
+        int counter = 0;
+
         double goalX  = 60, goalY = 60;
 
         String shootOneSlot = "", shootTwoSlot = "", shootThreeSlot = "";
@@ -145,7 +150,7 @@ public class BasicDriveTest extends Base {
         telemetry.update();
 
         //double degreeToServo = ((0.5 - 0.12) /45);
-        double degreeToServo = ((0.5 - 0.14) /45);
+        double degreeToServo = ((0.4994 - 0.3598) / 100);
 
 
 
@@ -157,8 +162,8 @@ public class BasicDriveTest extends Base {
         rotOne.setPosition(0.5);
         rotTwo.setPosition(0.5);
 
-        hoodOne.setPosition(0.75);
-        hoodTwo.setPosition(0.25);
+        hoodOne.setPosition(0.7);
+        hoodTwo.setPosition(0.3);
 
         kickerOne.setPosition(KICKER_ONE_DOWN);
         kickerTwo.setPosition(KICKER_TWO_DOWN);
@@ -173,8 +178,12 @@ public class BasicDriveTest extends Base {
 //
 //            rotOne.setPosition(0.75);
 //            rotTwo.setPosition(0.75);
-            double theta = Math.toDegrees(Math.atan2(goalX - getX(), goalY - getY())) + (getAngle());
-            double turretPos =  0.5 - (theta*degreeToServo) - 0.035;
+            double addOn = counter * 0.01;
+            double theta = Math.toDegrees(Math.atan2(goalX + getX(), goalY + getY())) + (getAngle());
+            double turretPos =  0.59 - (theta*degreeToServo) - 0.0775 + addOn;
+
+
+
 
             if(autoAim) {
 
@@ -188,17 +197,20 @@ public class BasicDriveTest extends Base {
             turrUpCurr = gamepad2.dpad_right;
             if(turrUpCurr && !turrUpLast){
                 autoAim = false;
-                rotOne.setPosition(rotOne.getPosition() - 0.035);
-                rotTwo.setPosition(rotTwo.getPosition() - 0.035);
+                rotOne.setPosition(rotOne.getPosition() - 0.0065);
+                rotTwo.setPosition(rotTwo.getPosition() - 0.0065);
+                counter --;
             }
 
             turrDownLast = turrDownCurr;
             turrDownCurr = gamepad2.dpad_left;
             if(turrDownCurr && !turrDownLast){
                 autoAim = false;
-                rotOne.setPosition(rotOne.getPosition() + 0.035);
-                rotTwo.setPosition(rotTwo.getPosition() + 0.035);
+                rotOne.setPosition(rotOne.getPosition() + 0.01);
+                rotTwo.setPosition(rotTwo.getPosition() + 0.01);
+                counter++;
             }
+
 
 
             if(!autoAim && (Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.left_stick_x) > 0.1) ){
@@ -227,52 +239,68 @@ public class BasicDriveTest extends Base {
 
             driveFieldCentric(drive, turn, strafe, powerCap);
 
+            resetLast = resetCurr;
+            resetCurr = gamepad2.left_stick_button;
 
-            if(gamepad2.left_stick_button){
+            if(resetCurr && !resetLast){
                 odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, odo.getHeading(AngleUnit.DEGREES)));
             }
 
-            if (gamepad2.left_trigger > 0.05) {
+            if (gamepad2.left_bumper) {
                 shooterMode = true;
                 doRumble = true;
             }
 
-            if (Math.abs(shooterOne.retMotorEx().getVelocity()) - targetVelocity < 25 && doRumble) {
+            if (Math.abs(shooterOne.getVelocity()) - targetVelocity < 25 && doRumble) {
                 gamepad2.rumble(500);
                 doRumble = false;
             }
-            if (gamepad2.right_trigger > 0.05) {
+            if (gamepad2.right_bumper) {
                 shooterMode = false;
 
             }
 
 
             if (shooterMode) {
-                TPS = shooterOne.retMotorEx().getVelocity();
+                TPS = shooterOne.getVelocity();
 
-                error = targetVelocity - shooterOne.retMotorEx().getVelocity();
+                error = Math.abs(targetVelocity) - Math.abs(shooterOne.getVelocity());
 
-                double p = kp * error;
-                double feedforward = kv * targetVelocity;
+
+                double p = (0.015) * error;
+                double feedforward = (0.00055) * targetVelocity;
 
                 double pow = p + feedforward;
 
-                double finalPow = Range.clip(pow, -1, 1);
 
 
-                shooterOne.setPower(finalPow);
-                shooterTwo.setPower(-finalPow);
+
+                shooterOne.setPower(-pow);
+                shooterTwo.setPower(pow);
+//                shooterOne.retMotorEx().setVelocity(-1400);
+//                shooterTwo.retMotorEx().setVelocity(1400);
             } else {
                 shooterOne.setPower(0);
                 shooterTwo.setPower(0);
             }
 
             if (gamepad1.left_bumper) {
-                frontSweeper.setPower(0.95);
-                backSweeper.setPower(0.95);
+                frontSweeper.setPower(-1);
+                backSweeper.setPower(0);
             } else if (gamepad1.right_bumper) {
-                frontSweeper.setPower(-0.95);
-                backSweeper.setPower(-0.95);
+//                if(fLeft.retMotorEx().getPower() > 0.2 || fRight.retMotorEx().getPower() > 0.2){
+//                    backSweeper.setPower(-0.8);
+//                    frontSweeper.setPower(0);
+//                }else if(fLeft.retMotorEx().getPower() < -0.2 || bLeft.retMotorEx().getPower() < -0.2){
+//                    frontSweeper.setPower(-0.8);
+//                    backSweeper.setPower(0);
+//                }else{
+//                    frontSweeper.setPower(-0.8);
+//                    backSweeper.setPower(-0.8);
+//                }
+                backSweeper.setPower(1);
+                frontSweeper.setPower(0);
+
             } else {
                 frontSweeper.setPower(0);
                 backSweeper.setPower(0);
@@ -296,21 +324,21 @@ public class BasicDriveTest extends Base {
                 timerOne.reset();
             }
 
-            if (timerOne.milliseconds() > 165 && kickOne) {
+            if (timerOne.milliseconds() > 200 && kickOne) {
                 kickerThree.setPosition(KICKER_THREE_DOWN);
                 kickOne = false;
                 kickTimer.reset();
                 bruhKick = true;
             }
 
-            if (kickTimer.milliseconds() > 45 && bruhKick) {
+            if (kickTimer.milliseconds() > 95  && bruhKick) {
                 kickerOne.setPosition(KICKER_ONE_UP);
                 kickTwo = true;
                 bruhKick = false;
                 timerTwo.reset();
             }
 
-            if (timerTwo.milliseconds() > 165 && kickTwo) {
+            if (timerTwo.milliseconds() > 200&& kickTwo) {
                 kickerOne.setPosition(KICKER_ONE_DOWN);
                 kickTwo = false;
                 kickerTimerTwo.reset();
@@ -318,19 +346,140 @@ public class BasicDriveTest extends Base {
 
             }
 
-            if (kickerTimerTwo.milliseconds() > 45 && bruhKickTwo) {
+            if (kickerTimerTwo.milliseconds() > 95 && bruhKickTwo) {
                 kickerTwo.setPosition(KICKER_TWO_UP);
                 kickThree = true;
                 bruhKickTwo = false;
                 timerThree.reset();
             }
 
-            if (timerThree.milliseconds() > 290 && kickThree) {
+            if (timerThree.milliseconds() > 250 && kickThree) {
                 kickerTwo.setPosition(KICKER_TWO_DOWN);
                 kickThree = false;
                 kickTimerThree.reset();
                 bruhKickThree = true;
             }
+
+//            triggerTwoLast = triggerTwoCurr;
+//            triggerTwoCurr = gamepad2.b;
+//
+//            String one = oneSlot, two = twoSlot, three = threeSlot;
+//
+//
+//            //Order - GPP
+//
+//            //back slot 1 front slot 2 middle slot 3
+//
+//            if (triggerOneCurr && !triggerOneLast) {
+//
+//                if(order[0].equals(one)){
+//                    kickerOne.setPosition(KICKER_ONE_UP);
+//                    oneShot = true;
+//                    oneKick = true;
+//                }else if(order[0].equals(two)){
+//                    kickerTwo.setPosition(KICKER_TWO_UP);
+//                    twoShot = true;
+//                    twoKick = true;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_UP);
+//                    threeShot = true;
+//                    threeKick = true;
+//                }
+//
+//
+//                kickOne = true;
+//                timerOne.reset();
+//            }
+//
+//            if (timerOne.milliseconds() > 190 && kickOne) {
+//
+//                if(oneKick){
+//                    kickerOne.setPosition(KICKER_ONE_DOWN);
+//                    oneKick = false;
+//                }else if(twoKick){
+//                    kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                    twoKick = false;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_DOWN);
+//                    threeKick = false;
+//                }
+//
+//                kickOne = false;
+//                kickTimer.reset();
+//                bruhKick = true;
+//            }
+//
+//            if (kickTimer.milliseconds() > 73  && bruhKick) {
+//
+//                if(order[1].equals(one) && !oneShot){
+//                    kickerOne.setPosition(KICKER_ONE_UP);
+//                    oneShot = true;
+//                    oneKick = true;
+//                }else if(order[1].equals(two) && !twoShot){
+//                    kickerTwo.setPosition(KICKER_TWO_UP);
+//                    twoShot = true;
+//                    twoKick = true;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_UP);
+//                    threeShot = true;
+//                    threeKick = true;
+//                }
+//                kickTwo = true;
+//                bruhKick = false;
+//                timerTwo.reset();
+//            }
+//
+//            if (timerTwo.milliseconds() > 190 && kickTwo) {
+//                if(oneKick){
+//                    kickerOne.setPosition(KICKER_ONE_DOWN);
+//                    oneKick = false;
+//                }else if(twoKick){
+//                    kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                    twoKick = false;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_DOWN);
+//                    threeKick = false;
+//                }
+//                kickTwo = false;
+//                kickerTimerTwo.reset();
+//                bruhKickTwo = true;
+//
+//            }
+//
+//            if (kickerTimerTwo.milliseconds() > 73 && bruhKickTwo) {
+//                if(oneShot && twoShot){
+//                    kickerThree.setPosition(KICKER_THREE_UP);
+//                    threeKick = true;
+//                }else if(oneShot && threeShot){
+//                    kickerTwo.setPosition(KICKER_TWO_UP);
+//                    twoKick = true;
+//                }else{
+//                    kickerOne.setPosition(KICKER_ONE_UP);
+//                    oneKick = true;
+//                }
+//                kickThree = true;
+//                bruhKickTwo = false;
+//                timerThree.reset();
+//            }
+//
+//            if (timerThree.milliseconds() > 190 && kickThree) {
+//                if(oneKick){
+//                    kickerOne.setPosition(KICKER_ONE_DOWN);
+//                    oneKick = false;
+//                }else if(twoKick){
+//                    kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                    twoKick = false;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_DOWN);
+//                    threeKick = false;
+//                }
+//                kickThree = false;
+//                kickTimerThree.reset();
+//                bruhKickThree = true;
+//            }
+
+
+
 
 
 
@@ -371,13 +520,13 @@ public class BasicDriveTest extends Base {
             toggleVeloLast = toggleVeloCurr;
             toggleVeloCurr = gamepad2.dpad_up;
             if(toggleVeloCurr && !toggleVeloLast){
-                targetVelocity += 25;
+                targetVelocity = 1750;
             }
 
             minusVeloLast = minusVeloCurr;
             minusVeloCurr = gamepad2.dpad_down;
             if(minusVeloCurr && !minusVeloLast){
-                targetVelocity -= 25;
+                targetVelocity = 1550;
             }
 
 //            double turrDrive = gamepad2.left_stick_x;
@@ -386,28 +535,19 @@ public class BasicDriveTest extends Base {
 //            rotTwo.setPower(-turrDrive * 0.7);
 
 
-            if(gamepad2.right_bumper){
-                hoodOne.setPosition(0.75);
-                hoodTwo.setPosition(0.25);
-                targetVelocity = 1150;
-            }
+//            if(gamepad2.right_bumper){
+//                hoodOne.setPosition(hoodOne.getPosition() + 0.004);
+//                hoodTwo.setPosition(hoodTwo.getPosition() - 0.004);
+//            }
+//
+//            if(gamepad2.left_bumper){
+//                hoodOne.setPosition(hoodOne.getPosition() - 0.004);
+//                hoodTwo.setPosition(hoodTwo.getPosition() + 0.004);
+////                targetVelocity = 1350;
+//
+//            }
 
-            if(gamepad2.left_bumper){
-                hoodTwo.setPosition(1 - targetHood);
-                hoodOne.setPosition(targetHood);
-//                targetVelocity = 1350;
 
-            }
-
-            if(gamepad1.right_trigger > 0.05){
-                hoodOne.setPosition(hoodOne.getPosition() + 0.002);
-                hoodTwo.setPosition(hoodTwo.getPosition() - 0.002);
-            }
-
-            if (gamepad1.left_trigger > 0.05){
-                hoodOne.setPosition(hoodOne.getPosition() - 0.002);
-                hoodTwo.setPosition(hoodTwo.getPosition() + 0.002);
-            }
 
 
 
@@ -420,36 +560,51 @@ public class BasicDriveTest extends Base {
 
 //            Pose2D pos = odo.getPosition();
 //            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES));
-            if(slotOut.getDistance(DistanceUnit.CM) > 2.5){
+
+            if(slotIntake.getDistance(DistanceUnit.CM) > 3 && finalColor.getDistance(DistanceUnit.CM) >3){
                 twoSlot = "empty";
             }else{
-                if(slotOut.green() > 4000){
-                    twoSlot = "green";
+                if(slotIntake.getDistance(DistanceUnit.CM) < finalColor.getDistance(DistanceUnit.CM)){
+                    if(slotIntake.green() > 2080){
+                        twoSlot = "green";
+                    }else{
+                        twoSlot = "purple";
+                    }
                 }else{
-                    twoSlot = "purple";
+                    if(finalColor.green() > 340){
+                        twoSlot = "green";
+                    }else{
+                        twoSlot = "purple";
+                    }
                 }
             }
 
-            if(slotIntake.getDistance(DistanceUnit.CM) > 2.5){
+            if(slotOut.getDistance(DistanceUnit.CM) > 3 && lastColor.getDistance(DistanceUnit.CM) >3){
                 oneSlot = "empty";
             }else{
-                if(slotIntake.green() > 1500){
-                    oneSlot = "green";
+                if(slotOut.getDistance(DistanceUnit.CM) < lastColor.getDistance(DistanceUnit.CM)){
+                    if(slotOut.green() > 1050){
+                        oneSlot = "green";
+                    }else{
+                        oneSlot = "purple";
+                    }
                 }else{
-                    oneSlot = "purple";
+                    if(lastColor.green() > 2500){
+                        oneSlot = "green";
+                    }else{
+                        oneSlot = "purple";
+                    }
                 }
             }
 
-            if(finalColor.getDistance(DistanceUnit.CM) > 2.5){
-                threeSlot = "empty";
-
+            if(oneSlot.equals("purple") && twoSlot.equals("purple")){
+                threeSlot = "green";
             }else{
-                if(finalColor.green() > 550){
-                    threeSlot = "green";
-                }else{
-                    threeSlot = "purple";
-                }
+                threeSlot = "purple";
             }
+
+
+
 
 
 
@@ -457,48 +612,68 @@ public class BasicDriveTest extends Base {
 
             Pose2D pos = odo.getPosition();
 
-            double xTrans = pos.getX(DistanceUnit.INCH) - 60;
-            double yTrans = pos.getY(DistanceUnit.INCH) - 60;
+            double xTrans = pos.getX(DistanceUnit.INCH) + 60;
+            double yTrans = pos.getY(DistanceUnit.INCH) + 60;
 
 
             double total = Math.pow(Math.abs(xTrans), 2) + Math.pow(Math.abs(yTrans), 2);
             double totalDist = Math.sqrt(total);
-
-            targetVelocity = ((0.00140975)*Math.pow(totalDist, 3)) - ((0.220911)*Math.pow(totalDist, 2)) + ((14.5839)*totalDist) + 648.70982; //Cubic Regression for Shooter Power
-
-            targetHood = ((0.00000479676)*Math.pow(totalDist, 3)) - ((0.000977643)*Math.pow(totalDist, 2)) + ((0.0650809)*totalDist) - 0.706044; //Cubic Regression for Hood Position
+;
+//            targetVelocity = ((0.000827923)*Math.pow(totalDist, 3)) - ((0.137619)*Math.pow(totalDist, 2)) + ((12.04007)*totalDist) + 988.36408; //Cubic Regression for Shooter Power
+//            if(targetVelocity < 1420){
+//                targetVelocity -= 45;
+//            }
+            targetHood =  ((-0.0000382087)*Math.pow(totalDist, 2)) + ((0.005844054)*totalDist) + 0.674147; //Cubic Regression for Hood Position
+            if(targetHood > .87){
+                targetHood = .92;
+            }
 
             hoodOne.setPosition(targetHood);
             hoodTwo.setPosition(1 - targetHood);
-
+            telemetry.addData("F Left Pow", fLeft.retMotorEx().getPower());
             telemetry.addData("X", pos.getX(DistanceUnit.INCH));
             telemetry.addData("Y", pos.getY(DistanceUnit.INCH));
             telemetry.addData("Trans X", xTrans);
             telemetry.addData("Trans Y", yTrans);
             telemetry.addData("Distance", totalDist);
             telemetry.addData("Heading", pos.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Turret", rotOne.getPosition());
+            telemetry.addData("Turret 2", rotTwo.getPosition());
 
             telemetry.addData("Slot 1", oneSlot);
             telemetry.addData("Slot 2", twoSlot);
-            telemetry.addData("Slot 3", threeSlot);
 
-            telemetry.addData("Shooter Velocity", shooterOne.retMotorEx().getVelocity());
-            telemetry.addData("Shooter 2 Velocity", shooterTwo.retMotorEx().getVelocity());
-            telemetry.addData("Shooter 1 Current", shooterOne.retMotorEx().getCurrent(CurrentUnit.MILLIAMPS));
-            telemetry.addData("Shooter 2 Current", shooterTwo.retMotorEx().getCurrent(CurrentUnit.MILLIAMPS));
-            telemetry.addData("Shooter 1 Power", shooterOne.retMotorEx().getPower());
-            telemetry.addData("Shooter 2 Power", shooterTwo.retMotorEx().getPower());
+            telemetry.addData("Conv", theta*degreeToServo);
+            telemetry.addData("Degree To Servo", degreeToServo);
+            telemetry.addData("Theta", theta);
+
+
+            telemetry.addData("Shooter Velocity", shooterOne.getVelocity());
+            telemetry.addData("Shooter 2 Velocity", shooterTwo.getVelocity());
+            telemetry.addData("Shooter 1 Current", shooterOne.getCurrent(CurrentUnit.MILLIAMPS));
+            telemetry.addData("Shooter 2 Current", shooterTwo.getCurrent(CurrentUnit.MILLIAMPS));
+            telemetry.addData("Shooter 1 Power", shooterOne.getPower());
+            telemetry.addData("Shooter 2 Power", shooterTwo.getPower());
+            telemetry.addData("Intake 1 Current", frontSweeper.retMotorEx().getCurrent(CurrentUnit.MILLIAMPS));
 
             telemetry.addData("Set Speed", targetVelocity);
+
             telemetry.addData("Green Slot 1", slotIntake.green());
             telemetry.addData("Green Slot 2", slotOut.green());
             telemetry.addData("Green Slot 3", finalColor.green());
+            telemetry.addData("Green Slot 4", lastColor.green());
+
             telemetry.addData("Distance 1", slotIntake.getDistance(DistanceUnit.CM));
             telemetry.addData("Distance 2", slotOut.getDistance(DistanceUnit.CM));
             telemetry.addData("Distance 3", finalColor.getDistance(DistanceUnit.CM));
+            telemetry.addData("Distance 4", lastColor.getDistance(DistanceUnit.CM));
 
             telemetry.addData("Hood 1", hoodOne.getPosition());
             telemetry.addData("Hood 2", hoodTwo.getPosition());
+
+            telemetry.addData("First", order[0]);
+            telemetry.addData("Second", order[1]);
+            telemetry.addData("Third", order[2]);
 
 
             telemetry.update();

@@ -24,8 +24,8 @@
 //import java.util.Map;
 //
 //
-//@TeleOp(name="Main Teleop")
-//public class Main_Tele extends Base {
+//@TeleOp(name="Blue Teleop T3")
+//public class T3_Blue_Tele extends Base {
 //
 //
 //
@@ -59,14 +59,9 @@
 //
 //
 //
-//        kickerOne = hardwareMap.servo.get("kickIntake");
-//        kickerTwo = hardwareMap.servo.get("kickOut");
-//        kickerThree = hardwareMap.servo.get("kickMiddle");
 //
 //
-//        RevColorSensorV3 slotIntake = hardwareMap.get(RevColorSensorV3.class, "colorIn");
-//        RevColorSensorV3 slotOut = hardwareMap.get(RevColorSensorV3.class, "colorOut");
-//        RevColorSensorV3 finalColor = hardwareMap.get(RevColorSensorV3.class, "colorLast");
+//
 //
 //
 //        hoodOne = hardwareMap.servo.get("hoodOne");
@@ -76,9 +71,9 @@
 //        int index = 0;
 //
 //        boolean triggerOneLast = false, triggerOneCurr = false, triggerTwoLast = false, triggerTwoCurr = false,
-//                triggerThreeLast = false, triggerThreeCurr = false;
-//        double KICKER_ONE_DOWN = 0.15, KICKER_ONE_UP = 0.634, KICKER_TWO_DOWN = 0.6, KICKER_TWO_UP = 0.3,
-//                KICKER_THREE_DOWN = 0.638, KICKER_THREE_UP = 0.91;
+//                triggerThreeLast = false, triggerThreeCurr = false, triggerFourCurr = false, triggerFourLast = false;
+//        double KICKER_ONE_DOWN = 0.2, KICKER_ONE_UP = 0.9, KICKER_TWO_DOWN = 1, KICKER_TWO_UP = 0.3,
+//                KICKER_THREE_DOWN = 0.15, KICKER_THREE_UP = 1;
 //
 //        boolean toggleVeloLast = false, toggleVeloCurr = false;
 //        boolean minusVeloLast = false, minusVeloCurr = false;
@@ -104,7 +99,8 @@
 //        double error = 0;
 //        boolean kickOne = false, kickTwo = false, kickThree = false;
 //        boolean bruhKick = false, bruhKickTwo = false, bruhKickThree = false;
-//        String oneSlot = "", twoSlot = "", threeSlot ="";
+//        int counter = 0;
+//
 //        double goalX  = 60, goalY = 60;
 //
 //        String shootOneSlot = "", shootTwoSlot = "", shootThreeSlot = "";
@@ -122,6 +118,7 @@
 //        DOWN_POSITIONS.put(kickerTwo, KICKER_TWO_DOWN);
 //        DOWN_POSITIONS.put(kickerThree, KICKER_THREE_DOWN);
 //
+//        double targetHood = 0.6;
 //
 //
 ////        double power = 1;
@@ -156,15 +153,14 @@
 //        rotOne.setPosition(0.5);
 //        rotTwo.setPosition(0.5);
 //
-//        hoodOne.setPosition(0.5);
-//        hoodTwo.setPosition(0.5);
+//        hoodOne.setPosition(0.75);
+//        hoodTwo.setPosition(0.25);
 //
 //        kickerOne.setPosition(KICKER_ONE_DOWN);
 //        kickerTwo.setPosition(KICKER_TWO_DOWN);
 //        kickerThree.setPosition(KICKER_THREE_DOWN);
 //
-//        odo.setPosition(new Pose2D(DistanceUnit.INCH, 15.1, 34.3, AngleUnit.DEGREES, 0));
-//
+//        odo.setPosition(new Pose2D(DistanceUnit.INCH, -15, 32, AngleUnit.DEGREES, 0));
 //
 //
 //        while(opModeIsActive()) {
@@ -172,8 +168,12 @@
 ////
 ////            rotOne.setPosition(0.75);
 ////            rotTwo.setPosition(0.75);
-//            double theta = Math.toDegrees(Math.atan2(goalX - getX(), goalY - getY())) + (getAngle());
-//            double turretPos =  0.5 - (theta*degreeToServo) - 0.035;
+//            double addOn = counter * 0.035;
+//            double theta = Math.toDegrees(Math.atan2(goalX - getX(), goalY - getY())) - (getAngle());
+//            double turretPos =  0.5 + (theta*degreeToServo) - 0.01 + 0.03 - 0.035 - 0.049;
+//
+//
+//
 //
 //            if(autoAim) {
 //
@@ -189,6 +189,7 @@
 //                autoAim = false;
 //                rotOne.setPosition(rotOne.getPosition() - 0.035);
 //                rotTwo.setPosition(rotTwo.getPosition() - 0.035);
+//                counter --;
 //            }
 //
 //            turrDownLast = turrDownCurr;
@@ -197,7 +198,9 @@
 //                autoAim = false;
 //                rotOne.setPosition(rotOne.getPosition() + 0.035);
 //                rotTwo.setPosition(rotTwo.getPosition() + 0.035);
+//                counter++;
 //            }
+//
 //
 //
 //            if(!autoAim && (Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.left_stick_x) > 0.1) ){
@@ -209,9 +212,9 @@
 //
 //
 //
-//            double drive = gamepad1.left_stick_y;
+//            double drive = -gamepad1.left_stick_y;
 //            double turn = -gamepad1.right_stick_x;
-//            double strafe = -gamepad1.left_stick_x;
+//            double strafe = gamepad1.left_stick_x;
 //
 //            fLeftPow = drive + turn + strafe;
 //            fRightPow = drive - turn - strafe;
@@ -267,11 +270,22 @@
 //            }
 //
 //            if (gamepad1.left_bumper) {
-//                frontSweeper.setPower(0.95);
-//                backSweeper.setPower(0.95);
+//                frontSweeper.setPower(-1);
+//                backSweeper.setPower(0);
 //            } else if (gamepad1.right_bumper) {
-//                frontSweeper.setPower(-0.95);
-//                backSweeper.setPower(-0.95);
+////                if(fLeft.retMotorEx().getPower() > 0.2 || fRight.retMotorEx().getPower() > 0.2){
+////                    backSweeper.setPower(-0.8);
+////                    frontSweeper.setPower(0);
+////                }else if(fLeft.retMotorEx().getPower() < -0.2 || bLeft.retMotorEx().getPower() < -0.2){
+////                    frontSweeper.setPower(-0.8);
+////                    backSweeper.setPower(0);
+////                }else{
+////                    frontSweeper.setPower(-0.8);
+////                    backSweeper.setPower(-0.8);
+////                }
+//                backSweeper.setPower(-1);
+//                frontSweeper.setPower(0);
+//
 //            } else {
 //                frontSweeper.setPower(0);
 //                backSweeper.setPower(0);
@@ -295,21 +309,21 @@
 //                timerOne.reset();
 //            }
 //
-//            if (timerOne.milliseconds() > 290 && kickOne) {
+//            if (timerOne.milliseconds() > 165 && kickOne) {
 //                kickerThree.setPosition(KICKER_THREE_DOWN);
 //                kickOne = false;
 //                kickTimer.reset();
 //                bruhKick = true;
 //            }
 //
-//            if (kickTimer.milliseconds() > 200 && bruhKick) {
+//            if (kickTimer.milliseconds() > 60  && bruhKick) {
 //                kickerOne.setPosition(KICKER_ONE_UP);
 //                kickTwo = true;
 //                bruhKick = false;
 //                timerTwo.reset();
 //            }
 //
-//            if (timerTwo.milliseconds() > 290 && kickTwo) {
+//            if (timerTwo.milliseconds() > 165 && kickTwo) {
 //                kickerOne.setPosition(KICKER_ONE_DOWN);
 //                kickTwo = false;
 //                kickerTimerTwo.reset();
@@ -317,19 +331,21 @@
 //
 //            }
 //
-//            if (kickerTimerTwo.milliseconds() > 200 && bruhKickTwo) {
+//            if (kickerTimerTwo.milliseconds() > 60 && bruhKickTwo) {
 //                kickerTwo.setPosition(KICKER_TWO_UP);
 //                kickThree = true;
 //                bruhKickTwo = false;
 //                timerThree.reset();
 //            }
 //
-//            if (timerThree.milliseconds() > 290 && kickThree) {
+//            if (timerThree.milliseconds() > 165 && kickThree) {
 //                kickerTwo.setPosition(KICKER_TWO_DOWN);
 //                kickThree = false;
 //                kickTimerThree.reset();
 //                bruhKickThree = true;
 //            }
+//
+//
 //
 //
 //
@@ -384,17 +400,21 @@
 //
 //
 //            if(gamepad2.right_bumper){
-//                hoodOne.setPosition(0.68);
-//                hoodTwo.setPosition(0.32);
+//                hoodOne.setPosition(0.75);
+//                hoodTwo.setPosition(0.25);
 //                targetVelocity = 1150;
 //            }
 //
 //            if(gamepad2.left_bumper){
-//                hoodOne.setPosition(0.6);
-//                hoodTwo.setPosition(0.4);
-//                targetVelocity = 1350;
+//                hoodTwo.setPosition(1 - targetHood);
+//                hoodOne.setPosition(targetHood);
+////                targetVelocity = 1350;
 //
 //            }
+//
+//
+//
+//
 //
 //
 //
@@ -405,49 +425,79 @@
 //
 ////            Pose2D pos = odo.getPosition();
 ////            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES));
-//            if(slotOut.getDistance(DistanceUnit.CM) > 2.5){
+//
+//            if(slotIntake.getDistance(DistanceUnit.CM) > 3 && finalColor.getDistance(DistanceUnit.CM) >3){
 //                twoSlot = "empty";
 //            }else{
-//                if(slotOut.green() > 4000){
-//                    twoSlot = "green";
+//                if(slotIntake.getDistance(DistanceUnit.CM) < finalColor.getDistance(DistanceUnit.CM)){
+//                    if(slotIntake.green() > 2080){
+//                        twoSlot = "green";
+//                    }else{
+//                        twoSlot = "purple";
+//                    }
 //                }else{
-//                    twoSlot = "purple";
+//                    if(finalColor.green() > 340){
+//                        twoSlot = "green";
+//                    }else{
+//                        twoSlot = "purple";
+//                    }
 //                }
 //            }
 //
-//            if(slotIntake.getDistance(DistanceUnit.CM) > 2.5){
+//            if(slotOut.getDistance(DistanceUnit.CM) > 3 && lastColor.getDistance(DistanceUnit.CM) >3){
 //                oneSlot = "empty";
 //            }else{
-//                if(slotIntake.green() > 1500){
-//                    oneSlot = "green";
+//                if(slotOut.getDistance(DistanceUnit.CM) < lastColor.getDistance(DistanceUnit.CM)){
+//                    if(slotOut.green() > 1050){
+//                        oneSlot = "green";
+//                    }else{
+//                        oneSlot = "purple";
+//                    }
 //                }else{
-//                    oneSlot = "purple";
+//                    if(lastColor.green() > 2500){
+//                        oneSlot = "green";
+//                    }else{
+//                        oneSlot = "purple";
+//                    }
 //                }
 //            }
 //
-//            if(finalColor.getDistance(DistanceUnit.CM) > 2.5){
-//                threeSlot = "empty";
 //
-//            }else{
-//                if(finalColor.green() > 550){
-//                    threeSlot = "green";
-//                }else{
-//                    threeSlot = "purple";
-//                }
-//            }
 //
 //
 //
 //
 //            Pose2D pos = odo.getPosition();
 //
+//            double xTrans = pos.getX(DistanceUnit.INCH) + 60;
+//            double yTrans = pos.getY(DistanceUnit.INCH) - 60;
+//
+//
+//            double total = Math.pow(Math.abs(xTrans), 2) + Math.pow(Math.abs(yTrans), 2);
+//            double totalDist = Math.sqrt(total);
+//
+//            targetVelocity = ((0.00140975)*Math.pow(totalDist, 3)) - ((0.220911)*Math.pow(totalDist, 2)) + ((14.5839)*totalDist) + 648.70982; //Cubic Regression for Shooter Power
+//            if(targetVelocity > 1400){
+//                targetVelocity = 1400;
+//            }
+//            targetHood = ((0.00000479676)*Math.pow(totalDist, 3)) - ((0.000977643)*Math.pow(totalDist, 2)) + ((0.0650809)*totalDist) - 0.706044; //Cubic Regression for Hood Position
+//            if(targetHood > .725){
+//                targetHood = .725;
+//            }
+//
+//            hoodOne.setPosition(targetHood);
+//            hoodTwo.setPosition(1 - targetHood);
+//            telemetry.addData("F Left Pow", fLeft.retMotorEx().getPower());
 //            telemetry.addData("X", pos.getX(DistanceUnit.INCH));
 //            telemetry.addData("Y", pos.getY(DistanceUnit.INCH));
+//            telemetry.addData("Trans X", xTrans);
+//            telemetry.addData("Trans Y", yTrans);
+//            telemetry.addData("Distance", totalDist);
 //            telemetry.addData("Heading", pos.getHeading(AngleUnit.DEGREES));
 //
 //            telemetry.addData("Slot 1", oneSlot);
 //            telemetry.addData("Slot 2", twoSlot);
-//            telemetry.addData("Slot 3", threeSlot);
+//
 //
 //            telemetry.addData("Shooter Velocity", shooterOne.retMotorEx().getVelocity());
 //            telemetry.addData("Shooter 2 Velocity", shooterTwo.retMotorEx().getVelocity());
@@ -457,12 +507,16 @@
 //            telemetry.addData("Shooter 2 Power", shooterTwo.retMotorEx().getPower());
 //
 //            telemetry.addData("Set Speed", targetVelocity);
+//
 //            telemetry.addData("Green Slot 1", slotIntake.green());
 //            telemetry.addData("Green Slot 2", slotOut.green());
 //            telemetry.addData("Green Slot 3", finalColor.green());
+//            telemetry.addData("Green Slot 4", lastColor.green());
+//
 //            telemetry.addData("Distance 1", slotIntake.getDistance(DistanceUnit.CM));
 //            telemetry.addData("Distance 2", slotOut.getDistance(DistanceUnit.CM));
 //            telemetry.addData("Distance 3", finalColor.getDistance(DistanceUnit.CM));
+//            telemetry.addData("Distance 4", lastColor.getDistance(DistanceUnit.CM));
 //
 //            telemetry.addData("Hood 1", hoodOne.getPosition());
 //            telemetry.addData("Hood 2", hoodTwo.getPosition());
@@ -915,5 +969,4 @@
 ////
 ////    }
 ////}
-//
 //

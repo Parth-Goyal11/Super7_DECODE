@@ -25,8 +25,8 @@ import java.util.Locale;
 import java.util.Map;
 
 @Disabled
-@TeleOp(name="Blue Teleop T2")
-public class BlueTele extends Base {
+@TeleOp(name="League Champs Blue Tele")
+public class New_Blue_Tele extends Base {
 
 
 
@@ -38,8 +38,6 @@ public class BlueTele extends Base {
         ElapsedTime timerOne = new ElapsedTime();
         ElapsedTime timerTwo = new ElapsedTime();
         ElapsedTime timerThree = new ElapsedTime();
-        ElapsedTime timerFour = new ElapsedTime();
-        ElapsedTime timerFive = new ElapsedTime();
         ElapsedTime kickTimer = new ElapsedTime();
         ElapsedTime kickerTimerTwo = new ElapsedTime();
         ElapsedTime kickTimerThree = new ElapsedTime();
@@ -47,12 +45,17 @@ public class BlueTele extends Base {
         String[] order2 = {"purple", "green", "purple"};
         String[] order3 = {"purple", "purple", "green"};
         ElapsedTime loopTime = new ElapsedTime();
-        double kv = 0.00057;
+        double kv = 0.0006;
 
         double kp = 0.018;
         double ki = 0;
         double kd = 0;
-        double targetVelocity = 1150;
+        double targetVelocity = 1500;
+
+
+
+
+
         resetCache();
 
 
@@ -62,14 +65,9 @@ public class BlueTele extends Base {
 
 
 
-        kickerOne = hardwareMap.servo.get("kickIntake");
-        kickerTwo = hardwareMap.servo.get("kickOut");
-        kickerThree = hardwareMap.servo.get("kickMiddle");
 
 
-        RevColorSensorV3 slotIntake = hardwareMap.get(RevColorSensorV3.class, "colorIn");
-        RevColorSensorV3 slotOut = hardwareMap.get(RevColorSensorV3.class, "colorOut");
-        RevColorSensorV3 finalColor = hardwareMap.get(RevColorSensorV3.class, "colorLast");
+
 
 
         hoodOne = hardwareMap.servo.get("hoodOne");
@@ -79,9 +77,9 @@ public class BlueTele extends Base {
         int index = 0;
 
         boolean triggerOneLast = false, triggerOneCurr = false, triggerTwoLast = false, triggerTwoCurr = false,
-                triggerThreeLast = false, triggerThreeCurr = false, triggerFourLast = false, triggerFourCurr = false;
-        double KICKER_ONE_DOWN = 0.15, KICKER_ONE_UP = 0.634, KICKER_TWO_DOWN = 0.6, KICKER_TWO_UP = 0.3,
-                KICKER_THREE_DOWN = 0.638, KICKER_THREE_UP = 0.91;
+                triggerThreeLast = false, triggerThreeCurr = false, triggerFourCurr = false, triggerFourLast = false;
+        double KICKER_ONE_DOWN = 0.042, KICKER_ONE_UP = 1, KICKER_TWO_DOWN = 0.98, KICKER_TWO_UP = 0.18,
+                KICKER_THREE_DOWN = 0.065, KICKER_THREE_UP = 1;
 
         boolean toggleVeloLast = false, toggleVeloCurr = false;
         boolean minusVeloLast = false, minusVeloCurr = false;
@@ -95,6 +93,8 @@ public class BlueTele extends Base {
         boolean shoot = false;
         boolean intake = false;
         boolean canPush = false;
+        boolean oneShot = false, twoShot = false, threeShot = false;
+        boolean oneKick = false, twoKick = false, threeKick = false;
         ElapsedTime pushBall = new ElapsedTime();
         ElapsedTime reset = new ElapsedTime();
         boolean canReset = false;
@@ -105,10 +105,12 @@ public class BlueTele extends Base {
         double TPS = 0;
         boolean doRumble = true;
         double error = 0;
-        boolean kickOne = false, kickTwo = false, kickThree = false, kickFour = false, kickFive = false, kickSix = false;
+        boolean kickOne = false, kickTwo = false, kickThree = false;
         boolean bruhKick = false, bruhKickTwo = false, bruhKickThree = false;
-        String oneSlot = "", twoSlot = "", threeSlot ="";
-        double goalX  = 60, goalY = 60;
+        boolean resetLast = false, resetCurr = false;
+        int counter = 0;
+
+        double goalX = 60, goalY = 60;
 
         String shootOneSlot = "", shootTwoSlot = "", shootThreeSlot = "";
 
@@ -125,19 +127,23 @@ public class BlueTele extends Base {
         DOWN_POSITIONS.put(kickerTwo, KICKER_TWO_DOWN);
         DOWN_POSITIONS.put(kickerThree, KICKER_THREE_DOWN);
 
+        double targetHood = 0.6;
 
 
 //        double power = 1;
         double shooterPow = 1;
 
+//        kickerOne.setPosition(KICKER_ONE_DOWN);
+//        kickerTwo.setPosition(KICKER_TWO_DOWN);
+//        kickerThree.setPosition(KICKER_THREE_DOWN);
 
 //        hoodOne.setPosition(0.5);
 //        hoodTwo.setPosition(0.5);
 
 //        rotOne.setPosition(0.75);
 //        rotTwo.setPosition(0.75);
-
-
+//        rotOne.setPosition(0.5);
+//        rotTwo.setPosition(0.5);
 
 
         telemetry.addData("Status", "Initialized");
@@ -150,32 +156,35 @@ public class BlueTele extends Base {
 
 
         waitForStart();
+
         resetCache();
 
         rotOne.setPosition(0.5);
         rotTwo.setPosition(0.5);
 
-        hoodOne.setPosition(0.75);
-        hoodTwo.setPosition(0.25);
+        hoodOne.setPosition(0.7);
+        hoodTwo.setPosition(0.3);
 
         kickerOne.setPosition(KICKER_ONE_DOWN);
         kickerTwo.setPosition(KICKER_TWO_DOWN);
         kickerThree.setPosition(KICKER_THREE_DOWN);
 
-
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, -15, 32, AngleUnit.DEGREES, 0));
-        odo.update();
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, 15.1, 34.3, AngleUnit.DEGREES, 0));
 
 
 
         while(opModeIsActive()) {
             resetCache();
-
 //
 //            rotOne.setPosition(0.75);
 //            rotTwo.setPosition(0.75);
-            double theta = Math.toDegrees(Math.atan2(goalX - getX(), goalY - getY())) - (getAngle());
-            double turretPos =  0.5 + (theta*degreeToServo) - 0.01 + 0.03 - 0.035 - 0.049;
+            double addOn = counter * 0.035;
+            double theta = Math.toDegrees(Math.atan2(goalX + getX(), goalY - getY())) - (getAngle());
+
+            double turretPos =  0.59 + (theta*degreeToServo) - 0.052 - 0.02 + addOn;
+
+
+
 
             if(autoAim) {
 
@@ -191,6 +200,7 @@ public class BlueTele extends Base {
                 autoAim = false;
                 rotOne.setPosition(rotOne.getPosition() - 0.035);
                 rotTwo.setPosition(rotTwo.getPosition() - 0.035);
+                counter --;
             }
 
             turrDownLast = turrDownCurr;
@@ -199,7 +209,9 @@ public class BlueTele extends Base {
                 autoAim = false;
                 rotOne.setPosition(rotOne.getPosition() + 0.035);
                 rotTwo.setPosition(rotTwo.getPosition() + 0.035);
+                counter++;
             }
+
 
 
             if(!autoAim && (Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.left_stick_x) > 0.1) ){
@@ -208,6 +220,8 @@ public class BlueTele extends Base {
 
             odo.update();//7.5 in vertical to strafe
             //1 in horizontal to strafe
+
+
 
             double drive = -gamepad1.left_stick_y;
             double turn = -gamepad1.right_stick_x;
@@ -226,8 +240,10 @@ public class BlueTele extends Base {
 
             driveFieldCentric(drive, turn, strafe, powerCap);
 
+            resetLast = resetCurr;
+            resetCurr = gamepad2.left_stick_button;
 
-            if(gamepad2.left_stick_button){
+            if(resetCurr && !resetLast){
                 odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, odo.getHeading(AngleUnit.DEGREES)));
             }
 
@@ -249,29 +265,41 @@ public class BlueTele extends Base {
             if (shooterMode) {
                 TPS = shooterOne.getVelocity();
 
-                error = targetVelocity - shooterOne.getVelocity();
+                error = Math.abs(targetVelocity) - Math.abs(shooterOne.getVelocity());
 
-                double p = kp * error;
-                double feedforward = kv * targetVelocity;
+
+                double p = (0.021) * error;
+                double feedforward = (0.0004) * targetVelocity;
 
                 double pow = p + feedforward;
 
                 double finalPow = Range.clip(pow, -1, 1);
 
 
-                shooterOne.setPower(finalPow);
-                shooterTwo.setPower(-finalPow);
+                shooterOne.setPower(-finalPow);
+                shooterTwo.setPower(finalPow);
             } else {
                 shooterOne.setPower(0);
                 shooterTwo.setPower(0);
             }
 
-            if (gamepad1.left_bumper) {
-                frontSweeper.setPower(0.95);
-                backSweeper.setPower(0.95);
-            } else if (gamepad1.right_bumper) {
-                frontSweeper.setPower(-0.95);
-                backSweeper.setPower(-0.95);
+            if (gamepad1.right_bumper) {
+                frontSweeper.setPower(-1);
+                backSweeper.setPower(0);
+            } else if (gamepad1.left_bumper) {
+//                if(fLeft.retMotorEx().getPower() > 0.2 || fRight.retMotorEx().getPower() > 0.2){
+//                    backSweeper.setPower(-0.8);
+//                    frontSweeper.setPower(0);
+//                }else if(fLeft.retMotorEx().getPower() < -0.2 || bLeft.retMotorEx().getPower() < -0.2){
+//                    frontSweeper.setPower(-0.8);
+//                    backSweeper.setPower(0);
+//                }else{
+//                    frontSweeper.setPower(-0.8);
+//                    backSweeper.setPower(-0.8);
+//                }
+                backSweeper.setPower(-1);
+                frontSweeper.setPower(0);
+
             } else {
                 frontSweeper.setPower(0);
                 backSweeper.setPower(0);
@@ -295,21 +323,21 @@ public class BlueTele extends Base {
                 timerOne.reset();
             }
 
-            if (timerOne.milliseconds() > 290 && kickOne) {
+            if (timerOne.milliseconds() > 165 && kickOne) {
                 kickerThree.setPosition(KICKER_THREE_DOWN);
                 kickOne = false;
                 kickTimer.reset();
                 bruhKick = true;
             }
 
-            if (kickTimer.milliseconds() > 200 && bruhKick) {
+            if (kickTimer.milliseconds() > 75  && bruhKick) {
                 kickerOne.setPosition(KICKER_ONE_UP);
                 kickTwo = true;
                 bruhKick = false;
                 timerTwo.reset();
             }
 
-            if (timerTwo.milliseconds() > 290 && kickTwo) {
+            if (timerTwo.milliseconds() > 195 && kickTwo) {
                 kickerOne.setPosition(KICKER_ONE_DOWN);
                 kickTwo = false;
                 kickerTimerTwo.reset();
@@ -317,20 +345,137 @@ public class BlueTele extends Base {
 
             }
 
-            if (kickerTimerTwo.milliseconds() > 200 && bruhKickTwo) {
+            if (kickerTimerTwo.milliseconds() > 75 && bruhKickTwo) {
                 kickerTwo.setPosition(KICKER_TWO_UP);
                 kickThree = true;
                 bruhKickTwo = false;
                 timerThree.reset();
             }
 
-            if (timerThree.milliseconds() > 290 && kickThree) {
+            if (timerThree.milliseconds() > 165 && kickThree) {
                 kickerTwo.setPosition(KICKER_TWO_DOWN);
                 kickThree = false;
                 kickTimerThree.reset();
                 bruhKickThree = true;
             }
 
+//            triggerTwoLast = triggerTwoCurr;
+//            triggerTwoCurr = gamepad2.b;
+//
+//            String one = oneSlot, two = twoSlot, three = threeSlot;
+//
+//
+//            //Order - GPP
+//
+//            //back slot 1 front slot 2 middle slot 3
+//
+//            if (triggerOneCurr && !triggerOneLast) {
+//
+//                if(order[0].equals(one)){
+//                    kickerOne.setPosition(KICKER_ONE_UP);
+//                    oneShot = true;
+//                    oneKick = true;
+//                }else if(order[0].equals(two)){
+//                    kickerTwo.setPosition(KICKER_TWO_UP);
+//                    twoShot = true;
+//                    twoKick = true;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_UP);
+//                    threeShot = true;
+//                    threeKick = true;
+//                }
+//
+//
+//                kickOne = true;
+//                timerOne.reset();
+//            }
+//
+//            if (timerOne.milliseconds() > 190 && kickOne) {
+//
+//                if(oneKick){
+//                    kickerOne.setPosition(KICKER_ONE_DOWN);
+//                    oneKick = false;
+//                }else if(twoKick){
+//                    kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                    twoKick = false;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_DOWN);
+//                    threeKick = false;
+//                }
+//
+//                kickOne = false;
+//                kickTimer.reset();
+//                bruhKick = true;
+//            }
+//
+//            if (kickTimer.milliseconds() > 73  && bruhKick) {
+//
+//                if(order[1].equals(one) && !oneShot){
+//                    kickerOne.setPosition(KICKER_ONE_UP);
+//                    oneShot = true;
+//                    oneKick = true;
+//                }else if(order[1].equals(two) && !twoShot){
+//                    kickerTwo.setPosition(KICKER_TWO_UP);
+//                    twoShot = true;
+//                    twoKick = true;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_UP);
+//                    threeShot = true;
+//                    threeKick = true;
+//                }
+//                kickTwo = true;
+//                bruhKick = false;
+//                timerTwo.reset();
+//            }
+//
+//            if (timerTwo.milliseconds() > 190 && kickTwo) {
+//                if(oneKick){
+//                    kickerOne.setPosition(KICKER_ONE_DOWN);
+//                    oneKick = false;
+//                }else if(twoKick){
+//                    kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                    twoKick = false;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_DOWN);
+//                    threeKick = false;
+//                }
+//                kickTwo = false;
+//                kickerTimerTwo.reset();
+//                bruhKickTwo = true;
+//
+//            }
+//
+//            if (kickerTimerTwo.milliseconds() > 73 && bruhKickTwo) {
+//                if(oneShot && twoShot){
+//                    kickerThree.setPosition(KICKER_THREE_UP);
+//                    threeKick = true;
+//                }else if(oneShot && threeShot){
+//                    kickerTwo.setPosition(KICKER_TWO_UP);
+//                    twoKick = true;
+//                }else{
+//                    kickerOne.setPosition(KICKER_ONE_UP);
+//                    oneKick = true;
+//                }
+//                kickThree = true;
+//                bruhKickTwo = false;
+//                timerThree.reset();
+//            }
+//
+//            if (timerThree.milliseconds() > 190 && kickThree) {
+//                if(oneKick){
+//                    kickerOne.setPosition(KICKER_ONE_DOWN);
+//                    oneKick = false;
+//                }else if(twoKick){
+//                    kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                    twoKick = false;
+//                }else{
+//                    kickerThree.setPosition(KICKER_THREE_DOWN);
+//                    threeKick = false;
+//                }
+//                kickThree = false;
+//                kickTimerThree.reset();
+//                bruhKickThree = true;
+//            }
 
 
 
@@ -339,6 +484,36 @@ public class BlueTele extends Base {
 
 
 
+
+
+
+//            triggerTwoLast = triggerTwoCurr;
+//            triggerTwoCurr = gamepad2.b;   //Shoot this one last as it gets kind of stuck
+//            if(triggerTwoCurr && !triggerTwoLast){
+//                kickerTwo.setPosition(KICKER_TWO_UP);
+//                kickTwo = true;
+//                timerTwo.reset();
+//            }
+//
+//            if(timerTwo.milliseconds() > KICKER_WAIT_TIME && kickTwo){
+//                kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                kickTwo = false;
+//
+//            }
+//
+//
+//            triggerThreeLast = triggerThreeCurr;
+//            triggerThreeCurr = gamepad2.x;
+//            if(triggerThreeCurr && !triggerThreeLast){
+//                kickerThree.setPosition(KICKER_THREE_UP);
+//                kickThree = true;
+//                timerThree.reset();
+//            }
+//
+//            if(timerThree.milliseconds() > 290 && kickThree){
+//                kickerThree.setPosition(KICKER_THREE_DOWN);
+//                kickThree = false;
+//            }
 
 
             toggleVeloLast = toggleVeloCurr;
@@ -360,17 +535,20 @@ public class BlueTele extends Base {
 
 
             if(gamepad2.right_bumper){
-                hoodOne.setPosition(0.75);
-                hoodTwo.setPosition(0.25);
-                targetVelocity = 1150;
+                hoodOne.setPosition(hoodOne.getPosition() + 0.004);
+                hoodTwo.setPosition(hoodTwo.getPosition() - 0.004);
             }
 
             if(gamepad2.left_bumper){
-                hoodOne.setPosition(0.6);
-                hoodTwo.setPosition(0.4);
-                targetVelocity = 1350;
+                hoodOne.setPosition(hoodOne.getPosition() - 0.004);
+                hoodTwo.setPosition(hoodTwo.getPosition() + 0.004);
+//                targetVelocity = 1350;
 
             }
+
+
+
+
 
 
 
@@ -381,49 +559,96 @@ public class BlueTele extends Base {
 
 //            Pose2D pos = odo.getPosition();
 //            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES));
-            if(slotOut.getDistance(DistanceUnit.CM) > 2.5){
+
+            if(slotIntake.getDistance(DistanceUnit.CM) > 3 && finalColor.getDistance(DistanceUnit.CM) >3){
                 twoSlot = "empty";
             }else{
-                if(slotOut.green() > 4000){
-                    twoSlot = "green";
+                if(slotIntake.getDistance(DistanceUnit.CM) < finalColor.getDistance(DistanceUnit.CM)){
+                    if(slotIntake.green() > 2080){
+                        twoSlot = "green";
+                    }else{
+                        twoSlot = "purple";
+                    }
                 }else{
-                    twoSlot = "purple";
+                    if(finalColor.green() > 340){
+                        twoSlot = "green";
+                    }else{
+                        twoSlot = "purple";
+                    }
                 }
             }
 
-            if(slotIntake.getDistance(DistanceUnit.CM) > 2.5){
+            if(slotOut.getDistance(DistanceUnit.CM) > 3 && lastColor.getDistance(DistanceUnit.CM) >3){
                 oneSlot = "empty";
             }else{
-                if(slotIntake.green() > 1500){
-                    oneSlot = "green";
+                if(slotOut.getDistance(DistanceUnit.CM) < lastColor.getDistance(DistanceUnit.CM)){
+                    if(slotOut.green() > 1050){
+                        oneSlot = "green";
+                    }else{
+                        oneSlot = "purple";
+                    }
                 }else{
-                    oneSlot = "purple";
+                    if(lastColor.green() > 2500){
+                        oneSlot = "green";
+                    }else{
+                        oneSlot = "purple";
+                    }
                 }
             }
 
-            if(finalColor.getDistance(DistanceUnit.CM) > 2.5){
-                threeSlot = "empty";
-
+            if(oneSlot.equals("purple") && twoSlot.equals("purple")){
+                threeSlot = "green";
             }else{
-                if(finalColor.green() > 550){
-                    threeSlot = "green";
-                }else{
-                    threeSlot = "purple";
-                }
+                threeSlot = "purple";
             }
+
+            if(oneSlot.equals("empty") || twoSlot.equals("empty")){
+                oneSlot = ("purple");
+                twoSlot = ("green");
+            }
+
+
 
 
 
 
             Pose2D pos = odo.getPosition();
 
+            double xTrans = pos.getX(DistanceUnit.INCH) + 60;
+            double yTrans = pos.getY(DistanceUnit.INCH) - 60;
+
+
+            double total = Math.pow(Math.abs(xTrans), 2) + Math.pow(Math.abs(yTrans), 2);
+            double totalDist = Math.sqrt(total);
+            ;
+            targetVelocity = ((0.000827923)*Math.pow(totalDist, 3)) - ((0.137619)*Math.pow(totalDist, 2)) + ((12.04007)*totalDist) + 988.36408; //Cubic Regression for Shooter Power
+            if(targetVelocity < 1420){
+                targetVelocity -= 45;
+            }
+            targetHood =  ((-0.0000382087)*Math.pow(totalDist, 2)) + ((0.005844054)*totalDist) + 0.674147; //Cubic Regression for Hood Position
+            if(targetHood > .87){
+                targetHood = .92;
+            }
+
+            hoodOne.setPosition(targetHood);
+            hoodTwo.setPosition(1 - targetHood);
+            telemetry.addData("F Left Pow", fLeft.retMotorEx().getPower());
             telemetry.addData("X", pos.getX(DistanceUnit.INCH));
             telemetry.addData("Y", pos.getY(DistanceUnit.INCH));
+            telemetry.addData("Trans X", xTrans);
+            telemetry.addData("Trans Y", yTrans);
+            telemetry.addData("Distance", totalDist);
             telemetry.addData("Heading", pos.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Turret", rotOne.getPosition());
+            telemetry.addData("Turret 2", rotTwo.getPosition());
 
             telemetry.addData("Slot 1", oneSlot);
             telemetry.addData("Slot 2", twoSlot);
-            telemetry.addData("Slot 3", threeSlot);
+
+            telemetry.addData("Conv", theta*degreeToServo);
+            telemetry.addData("Degree To Servo", degreeToServo);
+            telemetry.addData("Theta", theta);
+
 
 //            telemetry.addData("Shooter Velocity", shooterOne.retMotorEx().getVelocity());
 //            telemetry.addData("Shooter 2 Velocity", shooterTwo.retMotorEx().getVelocity());
@@ -433,15 +658,23 @@ public class BlueTele extends Base {
 //            telemetry.addData("Shooter 2 Power", shooterTwo.retMotorEx().getPower());
 
             telemetry.addData("Set Speed", targetVelocity);
+
             telemetry.addData("Green Slot 1", slotIntake.green());
             telemetry.addData("Green Slot 2", slotOut.green());
             telemetry.addData("Green Slot 3", finalColor.green());
+            telemetry.addData("Green Slot 4", lastColor.green());
+
             telemetry.addData("Distance 1", slotIntake.getDistance(DistanceUnit.CM));
             telemetry.addData("Distance 2", slotOut.getDistance(DistanceUnit.CM));
             telemetry.addData("Distance 3", finalColor.getDistance(DistanceUnit.CM));
+            telemetry.addData("Distance 4", lastColor.getDistance(DistanceUnit.CM));
 
             telemetry.addData("Hood 1", hoodOne.getPosition());
             telemetry.addData("Hood 2", hoodTwo.getPosition());
+
+            telemetry.addData("First", order[0]);
+            telemetry.addData("Second", order[1]);
+            telemetry.addData("Third", order[2]);
 
 
             telemetry.update();
@@ -891,3 +1124,5 @@ public class BlueTele extends Base {
 //
 //    }
 //}
+
+

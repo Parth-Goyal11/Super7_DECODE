@@ -17,8 +17,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@Autonomous(name="Roarbots League Partner(Release after 9)")
-public class T1_Auto_Red extends Base{
+@Autonomous(name="Blue Leagues Solo Auto")
+public class Leagues_Blue_Auto extends Base{
 
     ArrayList<Point> shot1, firstIntake, gate, secondIntake, thirdIntake, park, bang1, bang2, shotBruh;
     int condition = 1;
@@ -71,14 +71,14 @@ public class T1_Auto_Red extends Base{
         kickerOne.setPosition(KICKER_ONE_DOWN);
         kickerTwo.setPosition(KICKER_TWO_DOWN);
         kickerThree.setPosition(KICKER_THREE_DOWN);
-        rotOne.setPosition(0.165);
-        rotTwo.setPosition(0.165);
+        rotOne.setPosition(0.9);
+        rotTwo.setPosition(0.9);
 
         shot1 = new ArrayList<>();
         shot1.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-29, -36, 0, 0.78)
+                                new Point(29, -36, 0, 0.78)
                         )
                 )
         );
@@ -87,8 +87,8 @@ public class T1_Auto_Red extends Base{
         shotBruh.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-20, -50, 0, 1),
-                                new Point(-29, -36, 0, 1)
+                                new Point(20, -50, 0, 1),
+                                new Point(29, -36, 0, 1)
                         )
                 )
         );
@@ -97,7 +97,7 @@ public class T1_Auto_Red extends Base{
         park.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-31, -16, 0, 0.8)
+                                new Point(31, -16, 0, 0.8)
                         )
                 )
         );
@@ -105,8 +105,8 @@ public class T1_Auto_Red extends Base{
         firstIntake.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-20, -45.5, 0, 1),
-                                new Point(11, -45.5, 0, 0.3)
+                                new Point(20, -45.5, 0, 1),
+                                new Point(-15.5, -45.5, 0, 0.3)
                         )
                 )
         );
@@ -115,7 +115,7 @@ public class T1_Auto_Red extends Base{
         bang1.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(27, -70, 0, 0.7)
+                                new Point(-27, -70, 0, 0.7)
                         )
                 )
         );
@@ -124,7 +124,7 @@ public class T1_Auto_Red extends Base{
         bang2.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(25, -94, 0, 0.7)
+                                new Point(-25, -94, 0, 0.7)
                         )
                 )
         );
@@ -135,8 +135,8 @@ public class T1_Auto_Red extends Base{
         gate.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-1, -58.5, 0, 0.8),
-                                new Point(23, -55.5, 0, 1)
+                                new Point(1, -52.5, 0, 0.8),
+                                new Point(-23, -55.5, 0, 1)
                         )
                 )
         );
@@ -145,8 +145,8 @@ public class T1_Auto_Red extends Base{
         secondIntake.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-20, -68, 0, 1),
-                                new Point(31, -68, 0, 0.3)
+                                new Point(20, -70, 0, 1),
+                                new Point(-31, -70 , 0, 0.3)
                         )
                 )
         );
@@ -157,8 +157,8 @@ public class T1_Auto_Red extends Base{
         thirdIntake.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-17.5, -93.5, 0, 1),
-                                new Point(16, -93.5, 0, 0.3)
+                                new Point(17.5, -92.5, 0, 1),
+                                new Point(-16, -92.5, 0, 0.3)
                         )
                 )
         );
@@ -269,7 +269,7 @@ public class T1_Auto_Red extends Base{
 //        sleep(200);
 //        kickerTwo.setPosition(KICKER_TWO_DOWN);
 
-        frontSweeper.setPower(-1);
+        backSweeper.setPower(-1);
 
         shooterOne.setPower(0);
         shooterTwo.setPower(0);
@@ -293,12 +293,16 @@ public class T1_Auto_Red extends Base{
 //            order = new String[]{"purple", "purple", "green"};
 //            condition = 3;
 //        }
-        sleep(500);
+
         frontSweeper.setPower(0);
         backSweeper.setPower(0);
 
-        rotOne.setPosition(0.175);
-        rotTwo.setPosition(0.175);
+        gate = PathGenerator.interpSplinePath(gate, new Point(getX(), getY(), 0));
+        ChaseTheCarrotConstantHeadingWithShooter(gate, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 1400, 1);
+        sleep(550);
+
+        rotOne.setPosition(0.875 );
+        rotTwo.setPosition(0.875);
 
 
 
@@ -308,9 +312,9 @@ public class T1_Auto_Red extends Base{
 
 
 
-        ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.6);
+        ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 0.55);
 
-        sleep(500);
+
 
 
         String one = oneSlot, two = twoSlot, three = threeSlot;
@@ -367,7 +371,7 @@ public class T1_Auto_Red extends Base{
         shooterOne.setPower(0);
         shooterTwo.setPower(0);
 
-        frontSweeper.setPower(-1);
+        backSweeper.setPower(-1);
 
 
         secondIntake = PathGenerator.interpSplinePath(secondIntake, new Point(getX(), getY(), 0));
@@ -377,11 +381,7 @@ public class T1_Auto_Red extends Base{
         frontSweeper.setPower(0);
         backSweeper.setPower(0);
 
-        gate = PathGenerator.interpSplinePath(gate, new Point(getX(), getY(), 0));
-        ChaseTheCarrotConstantHeadingWithShooter(gate, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 1400, 1);
-        shooterOne.setPower(0);
-        shooterTwo.setPower(0);
-        sleep(2000);
+
 
 //        gate = PathGenerator.interpSplinePath(gate, new Point(getX(), getY(), 0));
 //        ChaseTheCarrotConstantHeading(gate, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2300, 0.9);
@@ -398,12 +398,12 @@ public class T1_Auto_Red extends Base{
         two = twoSlot;
         three = threeSlot;
         timerOne.reset();
-        while(timerOne.milliseconds() < 3300){
+        while(timerOne.milliseconds() < 1350){
 
             resetCache();
 
             runShooter(1300);
-            if(timerOne.milliseconds() > 2000 && kickThree){
+            if(kickThree){
 
                 kickerThree.setPosition(KICKER_THREE_UP);
 
@@ -411,32 +411,32 @@ public class T1_Auto_Red extends Base{
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 310 + 2000 && loop2){
+            if(timerOne.milliseconds() > 310 && loop2){
 
                 kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
             }
 
-            if(timerOne.milliseconds() > 510 + 2000 && loop3){
+            if(timerOne.milliseconds() > 510 && loop3){
                 kickerOne.setPosition(KICKER_ONE_UP);
                 loop3 = false;
                 loop4 = true;
             }
 
-            if(timerOne.milliseconds() > 800 +  2000 && loop4){
+            if(timerOne.milliseconds() > 800 && loop4){
                 kickerOne.setPosition(KICKER_ONE_DOWN);
                 loop4 = false;
                 loop5 = true;
             }
 
-            if(timerOne.milliseconds() > 1000 + 2000 && loop5){
+            if(timerOne.milliseconds() > 1000 && loop5){
                 kickerTwo.setPosition(KICKER_TWO_UP);
                 loop5 = false;
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1300 + 2000 && loop6){
+            if(timerOne.milliseconds() > 1300 && loop6){
                 kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
@@ -450,87 +450,86 @@ public class T1_Auto_Red extends Base{
 
 
 
-//        frontSweeper.setPower(-1);
-//
-//
-//
-//        thirdIntake = PathGenerator.interpSplinePath(thirdIntake, new Point(getX(), getY(), 0));
-//        ChaseTheCarrotConstantHeading(thirdIntake, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 7000, 1);
-//
-//
-//        frontSweeper.setPower(0);
-//        backSweeper.setPower(0);
-//
+        backSweeper.setPower(-1);
+
+
+
+        thirdIntake = PathGenerator.interpSplinePath(thirdIntake, new Point(getX(), getY(), 0));
+        ChaseTheCarrotConstantHeading(thirdIntake, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 7000, 1);
+
+
+        frontSweeper.setPower(0);
+        backSweeper.setPower(0);
+
 //        ChaseTheCarrotConstantHeading(bang2, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 1250 , 1);
-//        sleep(500);
-//
-//
-//
-//
-//
-//        ChaseTheCarrotConstantHeadingWithColor(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500);
-//
-//
-//        one = oneSlot;
-//        two = twoSlot;
-//        three = threeSlot;
-//        timerOne.reset();
-//        while(timerOne.milliseconds() < 1300){
-//
-//            resetCache();
-//
-//            runShooter(1270);
-//            if(kickThree){
-//
-//                kickerThree.setPosition(KICKER_THREE_UP);
-//
-//                kickThree = false;
-//                loop2 = true;
-//            }
-//
-//            if(timerOne.milliseconds() > 310 && loop2){
-//
-//                kickerThree.setPosition(KICKER_THREE_DOWN);
-//                loop2 = false;
-//                loop3 = true;
-//            }
-//
-//            if(timerOne.milliseconds() > 490 && loop3){
-//                kickerOne.setPosition(KICKER_ONE_UP);
-//                loop3 = false;
-//                loop4 = true;
-//            }
-//
-//            if(timerOne.milliseconds() > 780 && loop4){
-//                kickerOne.setPosition(KICKER_ONE_DOWN);
-//                loop4 = false;
-//                loop5 = true;
-//            }
-//
-//            if(timerOne.milliseconds() > 980 && loop5){
-//                kickerTwo.setPosition(KICKER_TWO_UP);
-//                loop5 = false;
-//                loop6 = true;
-//            }
-//
-//            if(timerOne.milliseconds() > 1280 && loop6){
-//                kickerTwo.setPosition(KICKER_TWO_DOWN);
-//                loop6 = false;
-//            }
-//        }
-//        kickThree = true;
-//
-//
-//        oneShot = false;
-//        twoShot = false;
-//        threeShot = false;
-//
-//        oneKick = false;
-//        twoKick = false;
-//        threeKick = false;
-//
-//        shooterOne.setPower(0);
-//        shooterTwo.setPower(0);
+
+
+
+
+
+        ChaseTheCarrotConstantHeadingWithColor(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500);
+
+
+        one = oneSlot;
+        two = twoSlot;
+        three = threeSlot;
+        timerOne.reset();
+        while(timerOne.milliseconds() < 1350){
+
+            resetCache();
+
+            runShooter(1300);
+            if(kickThree){
+
+                kickerThree.setPosition(KICKER_THREE_UP);
+
+                kickThree = false;
+                loop2 = true;
+            }
+
+            if(timerOne.milliseconds() > 310 && loop2){
+
+                kickerThree.setPosition(KICKER_THREE_DOWN);
+                loop2 = false;
+                loop3 = true;
+            }
+
+            if(timerOne.milliseconds() > 510 && loop3){
+                kickerOne.setPosition(KICKER_ONE_UP);
+                loop3 = false;
+                loop4 = true;
+            }
+
+            if(timerOne.milliseconds() > 800 && loop4){
+                kickerOne.setPosition(KICKER_ONE_DOWN);
+                loop4 = false;
+                loop5 = true;
+            }
+
+            if(timerOne.milliseconds() > 1000 && loop5){
+                kickerTwo.setPosition(KICKER_TWO_UP);
+                loop5 = false;
+                loop6 = true;
+            }
+
+            if(timerOne.milliseconds() > 1300 && loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
+                loop6 = false;
+            }
+        }
+        kickThree = true;
+
+
+        oneShot = false;
+        twoShot = false;
+        threeShot = false;
+
+        oneKick = false;
+        twoKick = false;
+        threeKick = false;
+
+        shooterOne.setPower(0);
+        shooterTwo.setPower(0);
         ChaseTheCarrotConstantHeadingWithShooter(park, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
         shooterOne.setPower(0);
         shooterTwo.setPower(0);
@@ -542,3 +541,4 @@ public class T1_Auto_Red extends Base{
 
     }
 }
+
