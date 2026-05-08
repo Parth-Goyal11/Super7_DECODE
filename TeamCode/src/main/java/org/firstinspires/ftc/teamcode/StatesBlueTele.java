@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -17,22 +19,28 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.Core.Motor;
 
 import java.util.List;
 
 @Config
-@TeleOp(name="States Blue Teleop")
+@TeleOp(name="Houston Blue Teleop")
 public class StatesBlueTele extends LinearOpMode{
-    public static double kv = 0.00051;
+    public static double kv = 0.00052;
 
-    public static double kp = 0.004;
+    public static double TOF = 0;
+
+    public static double kp = 0.009;
     public static double ki = 0;
     public static double kd = 0;
     public static double targetVelocity = 1800; //1800 for far
 
-    double targetHood = 0.5;
+    public static double T_SHOOT = 0.25; //time in seconds for ball injection
 
+    double targetHood = 0.5;
+    double addVelo = 0;
     boolean upLast = false, upCurr = false;
     boolean downLast = false, downCurr = false;
     FtcDashboard dashboard;
@@ -50,8 +58,8 @@ public class StatesBlueTele extends LinearOpMode{
                 triggerThreeLast = false, triggerThreeCurr = false, triggerFourCurr = false, triggerFourLast = false;
 
 
-        double KICKER_ONE_DOWN = 0.953, KICKER_ONE_UP = 0.7, KICKER_TWO_DOWN = 1, KICKER_TWO_UP = 0.7,
-                KICKER_THREE_DOWN = 0.057, KICKER_THREE_UP = 1;
+        double KICKER_ONE_DOWN = 0.92, KICKER_ONE_UP = 0.58, KICKER_TWO_DOWN = 0.985, KICKER_TWO_UP = 0.63,
+                KICKER_THREE_DOWN = 0.01, KICKER_THREE_UP = 1;
         double powerCap = 1;
         ElapsedTime timerOne = new ElapsedTime();
         ElapsedTime timerTwo = new ElapsedTime();
@@ -66,7 +74,7 @@ public class StatesBlueTele extends LinearOpMode{
 
         //New Numerical Variables
         int counter = 0;
-        double goalX  = 72, goalY = 72;
+        double goalX  = -72, goalY = 72;
         double degreeToServo = ((0.4994 - 0.3598) / 98);
 
         //New Booleans
@@ -80,11 +88,12 @@ public class StatesBlueTele extends LinearOpMode{
         boolean twoYCurr = false, twoYLast = false;
         boolean twoBCurr = false, twoBLast = false;
         boolean resetLast = false, resetCurr = false;
+        boolean resetLast2 = false, resetCurr2 = false;
+        boolean dpUpLast = false, dpUpCurr = false;
+        boolean dpDownLast = false, dpDownCurr = false;
 
         //Booleans for Individual Kickers
         boolean kickX = false, kickY = false, kickB = false;
-
-        double tShoot = 0.2;
 
 
 
@@ -152,6 +161,10 @@ public class StatesBlueTele extends LinearOpMode{
         Servo hood;
         hood = hardwareMap.servo.get("hoodOne");
 
+        Servo tiltOne, tiltTwo;
+        tiltOne = hardwareMap.servo.get("tiltOne");
+        tiltTwo = hardwareMap.servo.get("tiltTwo");
+
 
         //Odometry Initialization
         GoBildaPinpointDriver odo;
@@ -163,12 +176,19 @@ public class StatesBlueTele extends LinearOpMode{
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.resetPosAndIMU();
 
+        Limelight3A limelight;
+
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        telemetry.setMsTransmissionInterval(11);
+        limelight.pipelineSwitch(0);
+        limelight.start();
+
         //Color Sensors
 //
-        RevColorSensorV3 slotIntake = hardwareMap.get(RevColorSensorV3.class, "colorIn");
-        RevColorSensorV3 slotOut = hardwareMap.get(RevColorSensorV3.class, "colorOut");
-        RevColorSensorV3 finalColor = hardwareMap.get(RevColorSensorV3.class, "colorLast");
-        RevColorSensorV3 lastColor = hardwareMap.get(RevColorSensorV3.class, "bruhColor");
+//        RevColorSensorV3 slotIntake = hardwareMap.get(RevColorSensorV3.class, "colorIn");
+//        RevColorSensorV3 slotOut = hardwareMap.get(RevColorSensorV3.class, "colorOut");
+//        RevColorSensorV3 finalColor = hardwareMap.get(RevColorSensorV3.class, "colorLast");
+//        RevColorSensorV3 lastColor = hardwareMap.get(RevColorSensorV3.class, "bruhColor");
 
         //Strings
         String slotOne = "";
@@ -189,10 +209,15 @@ public class StatesBlueTele extends LinearOpMode{
         dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
+        tiltOne.setPosition(0);
+        tiltTwo.setPosition(0.05);
 
         waitForStart();
 
         hood.setPosition(0.5);
+        kickerOne.setPosition(KICKER_ONE_DOWN);
+        kickerTwo.setPosition(KICKER_TWO_DOWN);
+        kickerThree.setPosition(KICKER_THREE_DOWN);
 
         odo.setPosition(new Pose2D(DistanceUnit.INCH, 36.91, -22.85, AngleUnit.DEGREES, odo.getHeading(AngleUnit.DEGREES)));
 
@@ -206,26 +231,43 @@ public class StatesBlueTele extends LinearOpMode{
                 hub.clearBulkCache();
             }
 
+
             odo.update();
             Pose2D pos = odo.getPosition();
 
 
+            //Calculations for "Shoot On the Move" Model
+            double V_X = odo.getVelX(DistanceUnit.INCH);
+            double V_Y = odo.getVelY(DistanceUnit.INCH);
+            double V_THETA = odo.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES);
 
-            double xTrans = pos.getX(DistanceUnit.INCH) - 60;
+            double X = -pos.getX(DistanceUnit.INCH);
+            double Y = pos.getY(DistanceUnit.INCH);
+
+            double xTrans = -pos.getX(DistanceUnit.INCH) + 60;
+
             double yTrans = pos.getY(DistanceUnit.INCH) + 60;
 
-            double xVelo = odo.getVelX(DistanceUnit.INCH);
-            double yVelo = odo.getVelY(DistanceUnit.INCH);
+            double angle = pos.getHeading(AngleUnit.DEGREES);
 
-            double xPred = xTrans;
+            double X_PRED = X + (V_X * T_SHOOT) + 60;
+            double diffX = X + (V_X * T_SHOOT) + 60;
+            double Y_PRED = Y + (V_Y * T_SHOOT) + 60;
+            double ANG_PRED = angle + (V_THETA * T_SHOOT);
+
+            double Virtual_GX = -72 + (V_X * TOF);
+            double Virtual_GY = goalY + (V_Y * TOF);
+
+
 
 
             double total = Math.pow(Math.abs(xTrans), 2) + Math.pow(Math.abs(yTrans), 2);
-
+            double otherTotal = Math.pow(Math.abs(diffX), 2) + Math.pow(Math.abs(Y_PRED), 2);
             double totalDist = Math.sqrt(total);
-            double addOn = counter * 0.0035;
-            double theta = Math.toDegrees(Math.atan2(goalX - pos.getX(DistanceUnit.INCH), goalY + pos.getY(DistanceUnit.INCH))) - (pos.getHeading(AngleUnit.DEGREES));
-            double turretPos =  0.486 + (theta*degreeToServo)  + addOn;
+            double regressDist = Math.sqrt(otherTotal);
+            double addOn = counter * 0.005;
+            double theta = Math.toDegrees(Math.atan2(Virtual_GX - pos.getX(DistanceUnit.INCH), Virtual_GY - pos.getY(DistanceUnit.INCH))) - (pos.getHeading(AngleUnit.DEGREES));
+            double turretPos =  0.5 + 0.12+ (theta*degreeToServo) + addOn;
 
 
 
@@ -242,8 +284,8 @@ public class StatesBlueTele extends LinearOpMode{
             turrUpCurr = gamepad2.dpad_right;
             if(turrUpCurr && !turrUpLast){
                 autoAim = false;
-                rotOne.setPosition(rotOne.getPosition() - 0.0035);
-                rotTwo.setPosition(rotTwo.getPosition() - 0.0035);
+                rotOne.setPosition(rotOne.getPosition() - 0.005);
+                rotTwo.setPosition(rotTwo.getPosition() - 0.005);
                 counter --;
             }
 
@@ -251,18 +293,12 @@ public class StatesBlueTele extends LinearOpMode{
             turrDownCurr = gamepad2.dpad_left;
             if(turrDownCurr && !turrDownLast){
                 autoAim = false;
-                rotOne.setPosition(rotOne.getPosition() + 0.0035);
-                rotTwo.setPosition(rotTwo.getPosition() + 0.0035);
+                rotOne.setPosition(rotOne.getPosition() + 0.005);
+                rotTwo.setPosition(rotTwo.getPosition() + 0.005);
                 counter++;
             }
 
-            if(gamepad2.dpad_up){
-                hood.setPosition(hood.getPosition() + 0.01);
-            }
 
-            if(gamepad2.dpad_down){
-                hood.setPosition(hood.getPosition() - 0.01);
-            }
 
 
 
@@ -274,24 +310,30 @@ public class StatesBlueTele extends LinearOpMode{
 
             double drive = gamepad1.left_stick_y;
             double turn = -gamepad1.right_stick_x;
-            double strafe = -gamepad1.left_stick_x;
-
-            pos = odo.getPosition();
-
-            double botHeading = pos.getHeading(AngleUnit.RADIANS);
-
-            double rotX = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
-            double rotY = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
+            double strafe =  -gamepad1.left_stick_x;
 
 
 
-            rotX = rotX * 1.1;
-
-            double denominator = Math.max( Math.abs(rotY) + Math.abs(rotX) + Math.abs(turn) , 1);
-            double fLeftPow = (rotY + rotX + turn) / denominator;
-            double bLeftPow = (rotY - rotX + turn) / denominator;
-            double fRightPow = (rotY - rotX - turn) / denominator;
-            double bRightPow = (rotY + rotX - turn) / denominator;
+//           pos = odo.getPosition();
+//
+//           double botHeading = pos.getHeading(AngleUnit.RADIANS);
+//
+//           double rotX = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
+//           double rotY = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
+//
+//
+//
+//           rotX = rotX * 1.1;
+//
+//           double denominator = Math.max( Math.abs(rotY) + Math.abs(rotX) + Math.abs(turn) , 1);
+//           double fLeftPow = (rotY + rotX + turn) / denominator;
+//           double bLeftPow = (rotY - rotX + turn) / denominator;
+//           double fRightPow = (rotY - rotX - turn) / denominator;
+//           double bRightPow = (rotY + rotX - turn) / denominator;
+            double fLeftPow = drive + turn + strafe;
+            double fRightPow = drive - turn - strafe;
+            double bLeftPow = drive + turn - strafe;
+            double bRightPow = drive - turn + strafe;
 
             fLeft.setPower(fLeftPow);
             fRight.setPower(fRightPow);
@@ -343,15 +385,42 @@ public class StatesBlueTele extends LinearOpMode{
             }
 
             if (gamepad1.left_bumper) {
+                if(gamepad1.dpad_down){
+                    frontSweeper.setPower(1);
+                    backSweeper.setPower(0);
+                }else{
+                    frontSweeper.setPower(-1);
+                    backSweeper.setPower(0);
+                }
+
                 frontSweeper.setPower(-1);
                 backSweeper.setPower(0);
             } else if (gamepad1.right_bumper) {
-                backSweeper.setPower(1);
-                frontSweeper.setPower(0);
+                if(gamepad1.dpad_down){
+                    backSweeper.setPower(-1);
+                    frontSweeper.setPower(0);
+                }else{
+                    backSweeper.setPower(1);
+                    frontSweeper.setPower(0);
+                }
+
             } else {
                 frontSweeper.setPower(0);
                 backSweeper.setPower(0);
 
+            }
+
+            dpUpLast = dpUpCurr;
+            dpUpCurr = gamepad2.dpad_up;
+            if(dpUpCurr && !dpUpLast){
+                addVelo += 15;
+            }
+
+            dpDownLast = dpDownCurr;
+            dpDownCurr = gamepad2.dpad_down;
+
+            if(dpDownCurr && !dpDownLast){
+                addVelo -= 15;
             }
 
             triggerOneLast = triggerOneCurr;
@@ -370,21 +439,21 @@ public class StatesBlueTele extends LinearOpMode{
                 timerOne.reset();
             }
 
-            if (timerOne.milliseconds() > 200 && kickOne) {
+            if (timerOne.milliseconds() > 150 && kickOne) {
                 kickerThree.setPosition(KICKER_THREE_DOWN);
                 kickOne = false;
                 kickTimer.reset();
                 bruhKick = true;
             }
 
-            if (kickTimer.milliseconds() > 95  && bruhKick) {
+            if (kickTimer.milliseconds() > 75  && bruhKick) {
                 kickerTwo.setPosition(KICKER_TWO_UP);
                 kickTwo = true;
                 bruhKick = false;
                 timerTwo.reset();
             }
 
-            if (timerTwo.milliseconds() > 200 && kickTwo) {
+            if (timerTwo.milliseconds() > 150 && kickTwo) {
                 kickerTwo.setPosition(KICKER_TWO_DOWN);
                 kickTwo = false;
                 kickerTimerTwo.reset();
@@ -392,14 +461,14 @@ public class StatesBlueTele extends LinearOpMode{
 
             }
 
-            if (kickerTimerTwo.milliseconds() > 95 && bruhKickTwo) {
+            if (kickerTimerTwo.milliseconds() > 75 && bruhKickTwo) {
                 kickerOne.setPosition(KICKER_ONE_UP);
                 kickThree = true;
                 bruhKickTwo = false;
                 timerThree.reset();
             }
 
-            if (timerThree.milliseconds() > 300 && kickThree) {
+            if (timerThree.milliseconds() > 200 && kickThree) {
                 kickerOne.setPosition(KICKER_ONE_DOWN);
                 kickThree = false;
                 kickTimerThree.reset();
@@ -457,81 +526,146 @@ public class StatesBlueTele extends LinearOpMode{
                 odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, odo.getHeading(AngleUnit.DEGREES)));
             }
 
+            resetLast2 = resetCurr2;
+            resetCurr2 = gamepad2.right_stick_button;
+
+            if(resetCurr2 && !resetLast2){
+                odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 49.94, AngleUnit.DEGREES, odo.getHeading(AngleUnit.DEGREES)));
+
+            }
+
+//           limelight.updateRobotOrientation(pos.getHeading(AngleUnit.DEGREES));
+//           LLResult result = limelight.getLatestResult();
+//
+//           if (result != null) {
+//               for (LynxModule hub : allHubs) {
+//                   hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+//               }
+//               if (result.isValid()) {
+//
+//                   int tagIDR = result.getFiducialResults().get(0).getFiducialId();
+//                   Pose3D botpose = result.getBotpose_MT2();
+//                   telemetry.addData("ID", tagIDR);
+//                   telemetry.addData("TX", result.getTx());
+//                   telemetry.addData("TXNC", result.getTxNC());
+//                   telemetry.addData("Heading", botpose.getOrientation().getYaw());
+//                   telemetry.update();
+//                   counter = tagIDR;
+//
+//               }else{
+//
+//
+//                   telemetry.addData("So", "Cooked");
+//
+//                   telemetry.update();
+//               }
+//           }else{
+//               telemetry.addData("Result", "Bruh");
+//               telemetry.update();
+//           }
+
 
             //Regression for Velocity - Quartic -> R^2 = 0.99
+            if(totalDist < 120){
+                targetVelocity = ((0.0000276907)*Math.pow(totalDist, 4)) - (0.00985515)*Math.pow(totalDist, 3) + ((1.19591)*Math.pow(totalDist, 2)) - ((52.17438)*totalDist) + 1514.81182 + addVelo;
+                targetHood = (-((2.49672)*Math.pow(10, -8))*Math.pow(totalDist, 4)) + ((0.00000753557)*Math.pow(totalDist, 3)) - ((0.000638399)*Math.pow(totalDist, 2)) + ((0.00592975)*totalDist) + 0.816007;
 
-            targetVelocity = ((-0.0000105231)*Math.pow(totalDist, 4)) + ((0.00335882)*Math.pow(totalDist, 3) - ((0.344996)*Math.pow(totalDist, 2)) + ((16.79623)*totalDist) + 1044.96012);
 
-
-            //Regression for Hood - Quartic -> R^2 = 1
-
-            targetHood = (((2.61303)*Math.pow(10, -7))*Math.pow(totalDist, 4)) - ((0.0000669)*Math.pow(totalDist, 3)) + ((0.00620573)*Math.pow(totalDist, 2)) - ((0.248683)*totalDist)+ 4.20828;
-
-            //Restrictions on Regression
-            //  -Hood locked to 0.5083 for far zone
-            //  -Hood Bounded
-            if(targetVelocity > 1600){
-                targetHood = 0.5083;
+            }else if(totalDist > 140){
+                targetVelocity = 137577;
+                targetHood = 0.07;
+            }else if(totalDist > 130){
+                targetVelocity = 1350;
+                targetHood = 0.07;
+            }else{
+                targetVelocity = 1313;
+                targetHood = 0.04;
             }
-            if(targetHood < 0.45){
-                targetHood = 0.45;
-            }
-
-            if(targetHood > 0.9094){
-                targetHood = 0.9094;
-            }
+//
+//
+//            //Regression for Hood - Quartic -> R^2 = 1
+//
+//           if(targetHood > 0.33){
+//               targetHood = 0.33;
+//           }
+//
+//           if(targetHood < 0.08){
+//               targetHood = 0.08;
+//           }
 
             hood.setPosition(targetHood);
 
+            //Clapped Ahh Regression for Ball TOF
+            TOF = -(((2.55487)*Math.pow(10, -8))*Math.pow(totalDist, 4)) + ((0.0000095244)*Math.pow(totalDist, 3)) - ((0.00125922)*Math.pow(totalDist, 2)) + ((0.0729211)*totalDist) - 0.965841;
+
+            //Restrictions on Regression
+            //  -Hood locked to 0.5083 for far zonezza
+            //  -Hood Bounded
+//           if(targetVelocity > 1600){
+//               targetHood = 0.5083;
+//           }
+//           if(targetHood < 0.45){
+//               targetHood = 0.45;
+//           }
+//
+//           if(targetHood > 0.9094){
+//               targetHood = 0.9094;
+//           }
+
+//           hood.setPosition(targetHood);
 
 
 
 
-            if(lastColor.getDistance(DistanceUnit.CM) < 2.2 || finalColor.getDistance(DistanceUnit.CM) < 2.2){
-                if(lastColor.getDistance(DistanceUnit.CM)<finalColor.getDistance(DistanceUnit.CM)){
-                    if(lastColor.green() > lastColor.blue()){
-                        slotOne = "green";
-                    }else{
-                        slotOne = "purple";
-                    }
-                }else{
-                    if(finalColor.green() > finalColor.green()){
-                        slotOne = "green";
-                    }else{
-                        slotOne = "purple";
-                    }
-                }
-            }else{
-                slotOne = "empty";
-            }
 
-            if(slotIntake.getDistance(DistanceUnit.CM) < 3.0 || slotOut.getDistance(DistanceUnit.CM) < 3.0){
-                if(slotIntake.getDistance(DistanceUnit.CM)<slotOut.getDistance(DistanceUnit.CM)){
-                    if(slotIntake.green() > slotIntake.blue()){
-                        slotTwo = "green";
-                    }else{
-                        slotTwo = "purple";
-                    }
-                }else{
-                    if(slotOut.green() > slotOut.blue()){
-                        slotTwo = "green";
-                    }else{
-                        slotTwo = "purple";
-                    }
-                }
-            }else{
-                slotTwo = "empty";
-            }
+//           if(lastColor.getDistance(DistanceUnit.CM) < 2.2 || finalColor.getDistance(DistanceUnit.CM) < 2.2){
+//               if(lastColor.getDistance(DistanceUnit.CM)<finalColor.getDistance(DistanceUnit.CM)){
+//                   if(lastColor.green() > lastColor.blue()){
+//                       slotOne = "green";
+//                   }else{
+//                       slotOne = "purple";
+//                   }
+//               }else{
+//                   if(finalColor.green() > finalColor.green()){
+//                       slotOne = "green";
+//                   }else{
+//                       slotOne = "purple";
+//                   }
+//               }
+//           }else{
+//               slotOne = "empty";
+//           }
+
+//           if(slotIntake.getDistance(DistanceUnit.CM) < 3.0 || slotOut.getDistance(DistanceUnit.CM) < 3.0){
+//               if(slotIntake.getDistance(DistanceUnit.CM)<slotOut.getDistance(DistanceUnit.CM)){
+//                   if(slotIntake.green() > slotIntake.blue()){
+//                       slotTwo = "green";
+//                   }else{
+//                       slotTwo = "purple";
+//                   }
+//               }else{
+//                   if(slotOut.green() > slotOut.blue()){
+//                       slotTwo = "green";
+//                   }else{
+//                       slotTwo = "purple";
+//                   }
+//               }
+//           }else{
+//               slotTwo = "empty";
+//           }
 
 
 
             telemetry.addData("Shooter Velo", Math.abs(shooter.getVelocity()));
+            telemetry.addData("TOF", TOF);
             telemetry.addData("Shooter Velo 2", Math.abs(shooterTwo.getVelocity()));
             telemetry.addData("Motor Current", shooter.getCurrent(CurrentUnit.MILLIAMPS));
             telemetry.addData("Target Velocity", targetVelocity);
             telemetry.addData("Pow", power);
             telemetry.addData("Shooter 2", shooterTwo.getPower());
             telemetry.addData("Hood", hood.getPosition());
+            telemetry.addData("Robot X Velo", odo.getVelX(DistanceUnit.INCH));
+            telemetry.addData("Robot Y Velo", odo.getVelY(DistanceUnit.INCH));
 
             dashboardTelemetry.addData("Velocity", Math.abs(shooter.getVelocity()));
             dashboardTelemetry.addData("Target Velocity", targetVelocity);
@@ -543,42 +677,51 @@ public class StatesBlueTele extends LinearOpMode{
             telemetry.addData("Trans Y", yTrans);
             telemetry.addData("Distance", totalDist);
 
-            telemetry.addData("Color 1", slotIntake.green());
-            telemetry.addData("Color 1 Red", slotIntake.red());
-            telemetry.addData("Color 1 Blue", slotIntake.blue());
-            telemetry.addData("Color 1 Dist", slotIntake.getDistance(DistanceUnit.CM));
-            telemetry.addData("Line", "Break");
+            telemetry.addData("Goal X", goalX);
+            telemetry.addData("Goal Y", goalY);
 
-            telemetry.addData("Color 2", slotOut.green());
-            telemetry.addData("Color 2 Red", slotOut.red());
-            telemetry.addData("Color 2 Blue", slotOut.blue());
-            telemetry.addData("Color 2 Dist", slotOut.getDistance(DistanceUnit.CM));
-            telemetry.addData("Line", "Break");
-
-
-
-
-
-            telemetry.addData("Color 3", lastColor.green());
-
-            telemetry.addData("Color 3 Blue", lastColor.blue());
-            telemetry.addData("Color 3 Dist", lastColor.getDistance(DistanceUnit.CM));
-
-            telemetry.addData("Line", "Break");
-
-            telemetry.addData("Color 4", finalColor.green());
-
-            telemetry.addData("Color 4 Blue", finalColor.blue());
-            telemetry.addData("Color 4 Dist", finalColor.getDistance(DistanceUnit.CM));
-
-
-            telemetry.addData("Highest Slot 2", Math.max(lastColor.green(), finalColor.green()));
-
-            telemetry.addData("Slot One", slotOne);
-            telemetry.addData("Slot Two", slotTwo);
-
-
+            telemetry.addData("Virtual Goal X", Virtual_GX);
+            telemetry.addData("Virtual Goal Y", Virtual_GY);
             telemetry.update();
+            //Actual Telemetry Stops Here
+
+
+//           telemetry.addData("Color 1", slotIntake.green());
+//           telemetry.addData("Color 1 Red", slotIntake.red());
+//           telemetry.addData("Color 1 Blue", slotIntake.blue());
+//           telemetry.addData("Color 1 Dist", slotIntake.getDistance(DistanceUnit.CM));
+//           telemetry.addData("Line", "Break");
+//
+//           telemetry.addData("Color 2", slotOut.green());
+//           telemetry.addData("Color 2 Red", slotOut.red());
+//           telemetry.addData("Color 2 Blue", slotOut.blue());
+//           telemetry.addData("Color 2 Dist", slotOut.getDistance(DistanceUnit.CM));
+//           telemetry.addData("Line", "Break");
+
+
+
+
+
+//           telemetry.addData("Color 3", lastColor.green());
+//
+//           telemetry.addData("Color 3 Blue", lastColor.blue());
+//           telemetry.addData("Color 3 Dist", lastColor.getDistance(DistanceUnit.CM));
+//
+//           telemetry.addData("Line", "Break");
+//
+//           telemetry.addData("Color 4", finalColor.green());
+//
+//           telemetry.addData("Color 4 Blue", finalColor.blue());
+//           telemetry.addData("Color 4 Dist", finalColor.getDistance(DistanceUnit.CM));
+//
+//
+//           telemetry.addData("Highest Slot 2", Math.max(lastColor.green(), finalColor.green()));
+
+//           telemetry.addData("Slot One", slotOne);
+//           telemetry.addData("Slot Two", slotTwo);
+//
+//
+//           telemetry.update();
 
 
 
@@ -609,4 +752,3 @@ public class StatesBlueTele extends LinearOpMode{
 
     }
 }
-

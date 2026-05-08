@@ -1,29 +1,29 @@
-package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-
-@Disabled
-@Autonomous(name="T1_Auto")
-public class T1_Auto extends Base{
-    @Override
-    public void runOpMode() throws InterruptedException {
-        initHardware(hardwareMap);
-        waitForStart();
-        moveToPosition(20, -10, -45, 3, 2, 0.7,  10000);
-        sleep(500);
-        stopDrive();
-        moveToPosition(40, -10, -90, 3, 2, 0.6, 10000);
-        sleep(500);
-        moveToPosition(40, 15, -90, 3, 2, 0.55, 10000);
-        sleep(500);
-        moveToPosition(20, -10, -45, 3, 2, 0.7, 10000);
-        sleep(500);
+//package org.firstinspires.ftc.teamcode;
+//
+//import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+//import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+//import com.qualcomm.robotcore.util.ElapsedTime;
+//
+//import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+//import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+//import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+//
+//@Disabled
+//@Autonomous(name="T1_Auto")
+//public class T1_Auto extends Base{
+//    @Override
+//    public void runOpMode() throws InterruptedException {
+//        initHardware(hardwareMap);
+//        waitForStart();
+//        moveToPosition(20, -10, -45, 3, 2, 0.7,  10000);
+//        sleep(500);
+//        stopDrive();
+//        moveToPosition(40, -10, -90, 3, 2, 0.6, 10000);
+//        sleep(500);
+//        moveToPosition(40, 15, -90, 3, 2, 0.55, 10000);
+//        sleep(500);
+//        moveToPosition(20, -10, -45, 3, 2, 0.7, 10000);
+//        sleep(500);
 
 
 
@@ -49,6 +49,6 @@ public class T1_Auto extends Base{
 
 
 
-
-    }
-}
+//
+//    }
+//}

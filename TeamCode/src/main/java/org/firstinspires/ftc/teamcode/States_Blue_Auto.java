@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@Autonomous(name="Blue States Solo Auto")
+@Autonomous(name="Worlds Blue Close 12")
 public class States_Blue_Auto extends Base{
 
     ArrayList<Point> shot1, adjustShot, midIntake, sweepMid, firstIntake, gate, secondIntake, thirdIntake, park, bang1, bang2, shotBruh, sweepGate, moveGate, sweepGateTwo, moveGateTwo, intakeOne, finalIntake, intakeOneCheck, finalPark;
@@ -55,14 +55,14 @@ public class States_Blue_Auto extends Base{
 
 
 
-        double KICKER_ONE_DOWN = 0.95, KICKER_ONE_UP = 0.6, KICKER_TWO_DOWN = 0.985, KICKER_TWO_UP = 0.7,
-                KICKER_THREE_DOWN = 0.06, KICKER_THREE_UP = 1;
+        double KICKER_ONE_DOWN = 0.92, KICKER_ONE_UP = 0.67, KICKER_TWO_DOWN = 0.985, KICKER_TWO_UP = 0.7,
+                KICKER_THREE_DOWN = 0.01, KICKER_THREE_UP = 0.6;
 
         kickerOne.setPosition(KICKER_ONE_DOWN);
         kickerTwo.setPosition(KICKER_TWO_DOWN);
         kickerThree.setPosition(KICKER_THREE_DOWN);
 
-        hoodOne.setPosition(0.57);
+        hoodOne.setPosition(0.31);
 
         rotOne.setPosition(0.559);
         rotTwo.setPosition(0.559);
@@ -108,7 +108,7 @@ public class States_Blue_Auto extends Base{
         intakeOne.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(16, 9.5, 0, 1)
+                                new Point(16, 7.5, 0, 1)
 
                         )
                 )
@@ -119,7 +119,7 @@ public class States_Blue_Auto extends Base{
                 new ArrayList<>(
                         Arrays.asList(
 
-                                new Point(41, 9.5, 0, 0.4)
+                                new Point(41, 7.5, 0, 0.4)
                         )
                 )
         );
@@ -130,7 +130,7 @@ public class States_Blue_Auto extends Base{
         midIntake.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(10, 32.5, 0, 1)
+                                new Point(10, 30, 0, 1)
 
                         )
                 )
@@ -140,7 +140,7 @@ public class States_Blue_Auto extends Base{
         sweepMid.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(53, 32.5, 0, 0.4)
+                                new Point(50, 30, 0, 0.4)
                         )
                 )
         );
@@ -188,8 +188,8 @@ public class States_Blue_Auto extends Base{
         gate.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(27,   10, 0, 0.9),
-                                new Point(51, 22, 0, 0.9)
+                                new Point(27, 10, 0, 0.9),
+                                new Point(48, 21 , 0, 0.6)
                         )
                 )
         );
@@ -199,7 +199,7 @@ public class States_Blue_Auto extends Base{
                 new ArrayList<>(
                         Arrays.asList(
                                 new Point(8, 54, 0, 0.9),
-                                new Point(47, 54, 0, 0.4)
+                                new Point(50, 54, 0, 0.4)
                         )
                 )
         );
@@ -287,7 +287,7 @@ public class States_Blue_Auto extends Base{
                 )
         );
 
-        hoodOne.setPosition(0.555);
+        hoodOne.setPosition(0.31);
 
 
         while(opModeInInit()){
@@ -344,7 +344,7 @@ public class States_Blue_Auto extends Base{
 
             resetCache();
 
-            runShooter(1400);
+            runShooter(980);
             if(kickThree && timerOne.milliseconds() > 100){
 
                 kickerThree.setPosition(KICKER_THREE_UP);
@@ -385,7 +385,7 @@ public class States_Blue_Auto extends Base{
         }
         kickThree = true;
 
-        hoodOne.setPosition(0.57);
+        hoodOne.setPosition(0.31);
 
         shooterOne.setPower(0);
         shooterTwo.setPower(0);
@@ -466,125 +466,50 @@ public class States_Blue_Auto extends Base{
 //        kickThree = true;
 
         timerOne.reset();
-        String one = oneSlot, two = twoSlot, three = threeSlot;
-        while(timerOne.milliseconds() < 1800){
+        while(timerOne.milliseconds() < 1275){
 
             resetCache();
 
-            runShooter(1350);
-            if(kickThree){
+            runShooter(980);
+            if(kickThree && timerOne.milliseconds() > 100){
 
-                if(order[0].equals(one)){
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneShot = true;
-                    oneKick = true;
-                }else if(order[0].equals(two)){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoShot = true;
-                    twoKick = true;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeShot = true;
-                    threeKick = true;
-                }
-
-
+                kickerThree.setPosition(KICKER_THREE_UP);
 
                 kickThree = false;
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 310 && loop2){
+            if(timerOne.milliseconds() > 250+100 && loop2){
 
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
-
-
+                kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
             }
 
-            if(timerOne.milliseconds() > 490 + 250 && loop3){
-
+            if(timerOne.milliseconds() > 430+100 && loop3){
+                kickerOne.setPosition(KICKER_ONE_UP);
                 loop3 = false;
                 loop4 = true;
-
-                if(order[1].equals(one) && !oneShot){
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneShot = true;
-                    oneKick = true;
-                }else if(order[1].equals(two) && !twoShot){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoShot = true;
-                    twoKick = true;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeShot = true;
-                    threeKick = true;
-                }
             }
 
-            if(timerOne.milliseconds() > 780 + 250 && loop4){
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
+            if(timerOne.milliseconds() > 680 +100&& loop4){
+                kickerOne.setPosition(KICKER_ONE_DOWN);
                 loop4 = false;
                 loop5 = true;
             }
 
-            if(timerOne.milliseconds() > 980 + 500 && loop5){
-                if(oneShot && twoShot){
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeKick = true;
-                }else if(oneShot && threeShot){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoKick = true;
-                }else{
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneKick = true;
-                }
+            if(timerOne.milliseconds() > 860+100 && loop5){
+                kickerTwo.setPosition(KICKER_TWO_UP);
                 loop5 = false;
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1280 + 500 && loop6){
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
+            if(timerOne.milliseconds() > 1150 +100&& loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
         }
         kickThree = true;
-
-        oneShot = false;
-        twoShot = false;
-        threeShot = false;
-
-        oneKick = false;
-        twoKick = false;
-        threeKick = false;
 
         frontSweeper.setPower(-1);
 
@@ -608,127 +533,50 @@ public class States_Blue_Auto extends Base{
         ChaseTheCarrotConstantHeadingWithColor(shotBruh, 9, 3, 27, 3, 1, 0.04, 0.04, 0.03, 0.0005, 0, 2500, 1);
 
         timerOne.reset();
-        one = oneSlot;
-        two = twoSlot;
-        three = threeSlot;
-        while(timerOne.milliseconds() < 1800){
+        while(timerOne.milliseconds() < 1275){
 
             resetCache();
 
-            runShooter(1400);
-            if(kickThree && timerOne.milliseconds()>80){
+            runShooter(980);
+            if(kickThree && timerOne.milliseconds() > 100){
 
-                if(order[0].equals(one)){
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneShot = true;
-                    oneKick = true;
-                }else if(order[0].equals(two)){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoShot = true;
-                    twoKick = true;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeShot = true;
-                    threeKick = true;
-                }
-
-
+                kickerThree.setPosition(KICKER_THREE_UP);
 
                 kickThree = false;
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 310 && loop2){
+            if(timerOne.milliseconds() > 250+100 && loop2){
 
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
-
-
+                kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
             }
 
-            if(timerOne.milliseconds() > 490 + 250 && loop3){
-
+            if(timerOne.milliseconds() > 430+100 && loop3){
+                kickerOne.setPosition(KICKER_ONE_UP);
                 loop3 = false;
                 loop4 = true;
-
-                if(order[1].equals(one) && !oneShot){
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneShot = true;
-                    oneKick = true;
-                }else if(order[1].equals(two) && !twoShot){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoShot = true;
-                    twoKick = true;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeShot = true;
-                    threeKick = true;
-                }
             }
 
-            if(timerOne.milliseconds() > 780 + 250 && loop4){
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
+            if(timerOne.milliseconds() > 680 +100&& loop4){
+                kickerOne.setPosition(KICKER_ONE_DOWN);
                 loop4 = false;
                 loop5 = true;
             }
 
-            if(timerOne.milliseconds() > 980 + 500 && loop5){
-                if(oneShot && twoShot){
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeKick = true;
-                }else if(oneShot && threeShot){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoKick = true;
-                }else{
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneKick = true;
-                }
+            if(timerOne.milliseconds() > 860+100 && loop5){
+                kickerTwo.setPosition(KICKER_TWO_UP);
                 loop5 = false;
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1280 + 500 && loop6){
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
+            if(timerOne.milliseconds() > 1150 +100&& loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
         }
         kickThree = true;
-
-        oneShot = false;
-        twoShot = false;
-        threeShot = false;
-
-        oneKick = false;
-        twoKick = false;
-        threeKick = false;
 
 
         frontSweeper.setPower(-1);
@@ -752,127 +600,50 @@ public class States_Blue_Auto extends Base{
 
 
         timerOne.reset();
-        one = oneSlot;
-        two = twoSlot;
-        three = threeSlot;
-        while(timerOne.milliseconds() < 1800){
+        while(timerOne.milliseconds() < 1275){
 
             resetCache();
 
-            runShooter(1350);
-            if(kickThree){
+            runShooter(980);
+            if(kickThree && timerOne.milliseconds() > 100){
 
-                if(order[0].equals(one)){
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneShot = true;
-                    oneKick = true;
-                }else if(order[0].equals(two)){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoShot = true;
-                    twoKick = true;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeShot = true;
-                    threeKick = true;
-                }
-
-
+                kickerThree.setPosition(KICKER_THREE_UP);
 
                 kickThree = false;
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 310 && loop2){
+            if(timerOne.milliseconds() > 250+100 && loop2){
 
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
-
-
+                kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
             }
 
-            if(timerOne.milliseconds() > 490 + 250 && loop3){
-
+            if(timerOne.milliseconds() > 430+100 && loop3){
+                kickerOne.setPosition(KICKER_ONE_UP);
                 loop3 = false;
                 loop4 = true;
-
-                if(order[1].equals(one) && !oneShot){
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneShot = true;
-                    oneKick = true;
-                }else if(order[1].equals(two) && !twoShot){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoShot = true;
-                    twoKick = true;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeShot = true;
-                    threeKick = true;
-                }
             }
 
-            if(timerOne.milliseconds() > 780 + 250 && loop4){
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
+            if(timerOne.milliseconds() > 680 +100&& loop4){
+                kickerOne.setPosition(KICKER_ONE_DOWN);
                 loop4 = false;
                 loop5 = true;
             }
 
-            if(timerOne.milliseconds() > 980 + 500 && loop5){
-                if(oneShot && twoShot){
-                    kickerThree.setPosition(KICKER_THREE_UP);
-                    threeKick = true;
-                }else if(oneShot && threeShot){
-                    kickerTwo.setPosition(KICKER_TWO_UP);
-                    twoKick = true;
-                }else{
-                    kickerOne.setPosition(KICKER_ONE_UP);
-                    oneKick = true;
-                }
+            if(timerOne.milliseconds() > 860+100 && loop5){
+                kickerTwo.setPosition(KICKER_TWO_UP);
                 loop5 = false;
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1280 + 500 && loop6){
-                if(oneKick){
-                    kickerOne.setPosition(KICKER_ONE_DOWN);
-                    oneKick = false;
-                }else if(twoKick){
-                    kickerTwo.setPosition(KICKER_TWO_DOWN);
-                    twoKick = false;
-                }else{
-                    kickerThree.setPosition(KICKER_THREE_DOWN);
-                    threeKick = false;
-                }
+            if(timerOne.milliseconds() > 1150 +100&& loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
         }
         kickThree = true;
-
-        oneShot = false;
-        twoShot = false;
-        threeShot = false;
-
-        oneKick = false;
-        twoKick = false;
-        threeKick = false;
 
         ChaseTheCarrotConstantHeading(finalPark, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 4000, 1);
 

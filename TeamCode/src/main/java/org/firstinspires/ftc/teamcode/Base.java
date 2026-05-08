@@ -59,9 +59,9 @@ public abstract class Base extends LinearOpMode{
     double KICKER_ONE_DOWN = 0.953, KICKER_ONE_UP = 0.7, KICKER_TWO_DOWN = 1, KICKER_TWO_UP = 0.7,
             KICKER_THREE_DOWN = 0.057, KICKER_THREE_UP = 1;
 
-    public static double kv = 0.00051;
+    public static double kv = 0.00052;
 
-    public static double kp = 0.004;
+    public static double kp = 0.009;
     public static double ki = 0;
     public static double kd = 0;
     public static double targetVelocity = 1400;
@@ -256,6 +256,51 @@ public abstract class Base extends LinearOpMode{
 
     }
 
+    //Clear Cache
+
+    public void resetCache(){
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
+    }
+
+    //Basic Drive Controls
+
+    public void driveFieldCentric(double drive, double turn, double strafe, double powerCap){
+        Pose2D pos = odo.getPosition();
+
+        double botHeading = pos.getHeading(AngleUnit.RADIANS);
+
+        double rotX = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
+        double rotY = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
+
+
+
+        rotX = rotX * 1.1;
+
+        double denominator = Math.max( Math.abs(rotY) + Math.abs(rotX) + Math.abs(turn) , 1);
+        double fLeftPow = (rotY + rotX + turn) / denominator;
+        double bLeftPow = (rotY - rotX + turn) / denominator;
+        double fRightPow = (rotY - rotX - turn) / denominator;
+        double bRightPow = (rotY + rotX - turn) / denominator;
+
+        setDrivePowers(fLeftPow, fRightPow, bLeftPow, bRightPow, powerCap);
+    }
+
+    public void setDrivePowers(double fLeftPow, double fRightPow, double bLeftPow, double bRightPow, double powerCap){
+        fLeft.setPower(fLeftPow * powerCap);
+        fRight.setPower(fRightPow * powerCap);
+        bLeft.setPower(bLeftPow * powerCap);
+        bRight.setPower(bRightPow * powerCap);
+    }
+
+    public void stopDrive(){
+        fLeft.setPower(0);
+        fRight.setPower(0);
+        bLeft.setPower(0);
+        bRight.setPower(0);
+    }
+
     //Kicker Commands
     public void initializeKickers(){
         kickerOne.setPosition(KICKER_ONE_DOWN);
@@ -309,8 +354,8 @@ public abstract class Base extends LinearOpMode{
         return angle;
     }
 
-    //Shooter Adjustment Handling
-    //
+    //Shooter Control
+
     public double regressFlywheelVelocity(double dist){
 
         return ((-0.0000105231)*Math.pow(dist, 4)) + ((0.00335882)*Math.pow(dist, 3) -
@@ -323,11 +368,35 @@ public abstract class Base extends LinearOpMode{
                 ((0.00620573)*Math.pow(dist, 2)) - ((0.248683)*dist)+ 4.20828;
     }
 
+    public void runShooter(double targetVelocity){
+        TPS = shooterOne.getVelocity();
+
+        error = Math.abs(targetVelocity) - Math.abs(shooterOne.getVelocity());
+
+        double p = kp * error;
+        double feedforward = kv * targetVelocity;
+
+        double pow = p + feedforward;
+
+        double finalPow = Range.clip(pow, -1, 1);
+
+        shooterOne.setPower(-finalPow);
+        shooterTwo.setPower(finalPow);
+    }
 
 
 
 
-    //MOVEMENT FUNCTIONS
+
+
+
+
+
+
+
+
+
+    //STATIONARY MOVEMENT FUNCTIONS - MAKE ANY NECESSARY CHANGES ON A NEW OVERLOADED METHOD
 
     //Incorporates CarrotChase Movement Algorithm with constantly running Shooter PID
     //TODO: Add parameter for shooter power, instead of setting to fixed velocity
@@ -373,7 +442,7 @@ public abstract class Base extends LinearOpMode{
 
 
             resetCache();
-            runShooter(1350);
+            runShooter(980);
 
 
             double x = pos.getX(DistanceUnit.INCH);
@@ -670,7 +739,7 @@ public abstract class Base extends LinearOpMode{
             pos = odo.getPosition();
 
             resetCache();
-            runShooter(1300);
+            runShooter(980);
             if(lastColor.getDistance(DistanceUnit.CM) < 2.2 || finalColor.getDistance(DistanceUnit.CM) < 2.2){
                 if(lastColor.getDistance(DistanceUnit.CM)<finalColor.getDistance(DistanceUnit.CM)){
                     if(lastColor.green() > lastColor.blue()){
@@ -961,27 +1030,6 @@ public abstract class Base extends LinearOpMode{
 
 
 
-    public void driveFieldCentric(double drive, double turn, double strafe, double powerCap){
-        Pose2D pos = odo.getPosition();
-
-        double botHeading = pos.getHeading(AngleUnit.RADIANS);
-
-        double rotX = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
-        double rotY = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
-
-
-
-        rotX = rotX * 1.1;
-
-        double denominator = Math.max( Math.abs(rotY) + Math.abs(rotX) + Math.abs(turn) , 1);
-        double fLeftPow = (rotY + rotX + turn) / denominator;
-        double bLeftPow = (rotY - rotX + turn) / denominator;
-        double fRightPow = (rotY - rotX - turn) / denominator;
-        double bRightPow = (rotY + rotX - turn) / denominator;
-
-        setDrivePowers(fLeftPow, fRightPow, bLeftPow, bRightPow, powerCap);
-    }
-
     public void driveFieldCentricAuto(double drive, double strafe, double angle, double speedCap){
         Pose2D pos = odo.getPosition();
 
@@ -1007,35 +1055,6 @@ public abstract class Base extends LinearOpMode{
 
     }
 
-    public void setDrivePowers(double fLeftPow, double fRightPow, double bLeftPow, double bRightPow, double powerCap){
-        fLeft.setPower(fLeftPow * powerCap);
-        fRight.setPower(fRightPow * powerCap);
-        bLeft.setPower(bLeftPow * powerCap);
-        bRight.setPower(bRightPow * powerCap);
-    }
-
-    public void stopDrive(){
-        fLeft.setPower(0);
-        fRight.setPower(0);
-        bLeft.setPower(0);
-        bRight.setPower(0);
-    }
-
-    public void runShooter(double targetVelocity){
-        TPS = shooterOne.getVelocity();
-
-        error = Math.abs(targetVelocity) - Math.abs(shooterOne.getVelocity());
-
-        double p = kp * error;
-        double feedforward = kv * targetVelocity;
-
-        double pow = p + feedforward;
-
-        double finalPow = Range.clip(pow, -1, 1);
-
-        shooterOne.setPower(-finalPow);
-        shooterTwo.setPower(finalPow);
-    }
 
 
     public double normalizeAngle(double rawAngle) {
@@ -1141,11 +1160,7 @@ public abstract class Base extends LinearOpMode{
 
 
 
-    public void resetCache(){
-        for (LynxModule hub : allHubs) {
-            hub.clearBulkCache();
-        }
-    }
+
 
 
 

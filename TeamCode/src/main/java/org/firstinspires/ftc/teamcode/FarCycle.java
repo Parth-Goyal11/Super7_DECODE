@@ -19,11 +19,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@Autonomous(name="Far Cycle")
-public class FarCycle extends Base{
+@Autonomous(name="Worlds Blue Far Spam")
+public class FarCycle extends Base {
 
     ArrayList<Point> shot1, adjustShot, midIntake, sweepMid, firstIntake, gate, secondIntake, thirdIntake, park, bang1, bang2, shotBruh, sweepGate, moveGate, sweepGateTwo, moveGateTwo, intakeOne, finalIntake, intakeOneCheck, finalPark;
     int condition = 1;
+
     @Override
     public void runOpMode() throws InterruptedException {
         boolean kickThree = true;
@@ -33,13 +34,11 @@ public class FarCycle extends Base{
         boolean oneKick = false, twoKick = false, threeKick = false;
         initHardware(hardwareMap);
 
-        ElapsedTime timerOne =  new ElapsedTime();
+        ElapsedTime timerOne = new ElapsedTime();
         ElapsedTime checkCurrent = new ElapsedTime();
 
 
         hoodOne = hardwareMap.servo.get("hoodOne");
-
-
 
 
         RevColorSensorV3 slotIntake = hardwareMap.get(RevColorSensorV3.class, "colorIn");
@@ -52,20 +51,18 @@ public class FarCycle extends Base{
         String[] order = new String[3];
 
 
-
-
-
         double KICKER_ONE_DOWN = 0.95, KICKER_ONE_UP = 0.6, KICKER_TWO_DOWN = 0.985, KICKER_TWO_UP = 0.7,
-                KICKER_THREE_DOWN = 0.06, KICKER_THREE_UP = 1;
+                KICKER_THREE_DOWN = 0.045, KICKER_THREE_UP = 1;
 
         kickerOne.setPosition(KICKER_ONE_DOWN);
         kickerTwo.setPosition(KICKER_TWO_DOWN);
         kickerThree.setPosition(KICKER_THREE_DOWN);
 
-        hoodOne.setPosition(0.555);
+        hoodOne.setPosition(0.2194);
 
-        rotOne.setPosition(0.517);
-        rotTwo.setPosition(0.517);
+        rotOne.setPosition(0.5185); //Blue Side
+        rotTwo.setPosition(0.5185); //Blue Side
+
 
 
 
@@ -90,7 +87,7 @@ public class FarCycle extends Base{
         shot1.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(35, 0, 0, 1)
+                                new Point(8, -10, 0, 1)
                         )
                 )
         );
@@ -99,7 +96,7 @@ public class FarCycle extends Base{
         adjustShot.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(49, 0, 0, 1)
+                                new Point(49, -8, 0, 0.65)
                         )
                 )
         );
@@ -108,7 +105,7 @@ public class FarCycle extends Base{
         intakeOne.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-16, 8, 0, 1)
+                                new Point(30, -8, 0, 1)
 
                         )
                 )
@@ -123,7 +120,6 @@ public class FarCycle extends Base{
                         )
                 )
         );
-
 
 
         midIntake = new ArrayList<>();
@@ -158,7 +154,7 @@ public class FarCycle extends Base{
         moveGate.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-49.8, 32.5 , 0, 0.9)
+                                new Point(-49.8, 32.5, 0, 0.9)
                         )
                 )
         );
@@ -182,8 +178,6 @@ public class FarCycle extends Base{
         );
 
 
-
-
         gate = new ArrayList<>();
         gate.addAll(
                 new ArrayList<>(
@@ -203,8 +197,6 @@ public class FarCycle extends Base{
                         )
                 )
         );
-
-
 
 
         shotBruh = new ArrayList<>();
@@ -228,8 +220,7 @@ public class FarCycle extends Base{
         firstIntake.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(-20, -45.5, 0, 1),
-                                new Point(15.5, -45.5, 0, 0.3)
+                               new Point(45, -2, 0, 0.5)
                         )
                 )
         );
@@ -238,7 +229,7 @@ public class FarCycle extends Base{
         bang1.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(27, -70, 0, 0.7)
+                                new Point(45, -19, 0, 0.7)
                         )
                 )
         );
@@ -247,13 +238,10 @@ public class FarCycle extends Base{
         bang2.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(25, -94, 0, 0.7)
+                                new Point(39, -26, 0, 0.4)
                         )
                 )
         );
-
-
-
 
 
         secondIntake = new ArrayList<>();
@@ -265,7 +253,6 @@ public class FarCycle extends Base{
                         )
                 )
         );
-
 
 
         thirdIntake = new ArrayList<>();
@@ -282,13 +269,14 @@ public class FarCycle extends Base{
         finalPark.addAll(
                 new ArrayList<>(
                         Arrays.asList(
-                                new Point(25, 0, 0, 0.6)
+                                new Point(5, -27, 0, 0.6)
+
                         )
                 )
         );
 
 
-        while(opModeInInit()){
+        while (opModeInInit()) {
             LLResult result = limelight.getLatestResult();
             if (result != null) {
                 resetCache();
@@ -300,48 +288,32 @@ public class FarCycle extends Base{
                     telemetry.update();
                     counter = tagIDR;
 
-                }else{
+                } else {
 
 
                     telemetry.addData("So", "Cooked");
 
                     telemetry.update();
                 }
-            }else{
+            } else {
                 telemetry.addData("Result", "Bruh");
                 telemetry.update();
             }
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
         waitForStart();
-
-
-
 
 
 //        ChaseTheCarrotConstantHeadingWithShooter(adjustShot, 9, 3, -42, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
 //        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
 
         timerOne.reset();
-        while(timerOne.milliseconds() < 1275 + 1000){
+        while (timerOne.milliseconds() < 1275 + 1000) {
 
             resetCache();
 
-            runShooter(1800);
+            runShooter(1318);
             if(kickThree && timerOne.milliseconds() > 1000){
 
                 kickerThree.setPosition(KICKER_THREE_UP);
@@ -350,39 +322,262 @@ public class FarCycle extends Base{
                 loop2 = true;
             }
 
-            if(timerOne.milliseconds() > 250+1000 && loop2){
+            if(timerOne.milliseconds() > 200+1000 && loop2){
 
                 kickerThree.setPosition(KICKER_THREE_DOWN);
                 loop2 = false;
                 loop3 = true;
             }
 
-            if(timerOne.milliseconds() > 430+1000 && loop3){
+            if(timerOne.milliseconds() > 380+1000 && loop3){
                 kickerOne.setPosition(KICKER_ONE_UP);
                 loop3 = false;
                 loop4 = true;
             }
 
-            if(timerOne.milliseconds() > 680 +1000&& loop4){
+            if(timerOne.milliseconds() > 630 +1000&& loop4){
                 kickerOne.setPosition(KICKER_ONE_DOWN);
                 loop4 = false;
                 loop5 = true;
             }
 
-            if(timerOne.milliseconds() > 860+1000 && loop5){
+            if(timerOne.milliseconds() > 810+1000 && loop5){
                 kickerTwo.setPosition(KICKER_TWO_UP);
                 loop5 = false;
                 loop6 = true;
             }
 
-            if(timerOne.milliseconds() > 1150 +1000&& loop6){
+            if(timerOne.milliseconds() > 1100 +1000&& loop6){
                 kickerTwo.setPosition(KICKER_TWO_DOWN);
                 loop6 = false;
             }
         }
         kickThree = true;
-        backSweeper.setPower(1);
-        ChaseTheCarrotConstantHeadingWithShooter(finalPark, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+        sleep(250);
+        //BLUE FAR CYCLING FAR SPIKE MARK
+//
+//        ChaseTheCarrotConstantHeadingWithShooter(finalPark, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+//
+//        frontSweeper.setPower(-1);
+//        ChaseTheCarrotConstantHeading(bang2, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+//        sleep(500);
+//        frontSweeper.setPower(0);
+//        rotOne.setPosition(0.5205); //Blue Side
+//        rotTwo.setPosition(0.5205);
+//        ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+//
+//        timerOne.reset();
+//        while (timerOne.milliseconds() < 1275 + 1000) {
+//
+//            resetCache();
+//
+//            runShooter(1295);
+//            if(kickThree && timerOne.milliseconds() > 1000){
+//
+//                kickerThree.setPosition(KICKER_THREE_UP);
+//
+//                kickThree = false;
+//                loop2 = true;
+//            }
+//
+//            if(timerOne.milliseconds() > 200+1000 && loop2){
+//
+//                kickerThree.setPosition(KICKER_THREE_DOWN);
+//                loop2 = false;
+//                loop3 = true;
+//            }
+//
+//            if(timerOne.milliseconds() > 380+1000 && loop3){
+//                kickerOne.setPosition(KICKER_ONE_UP);
+//                loop3 = false;
+//                loop4 = true;
+//            }
+//
+//            if(timerOne.milliseconds() > 630 +1000&& loop4){
+//                kickerOne.setPosition(KICKER_ONE_DOWN);
+//                loop4 = false;
+//                loop5 = true;
+//            }
+//
+//            if(timerOne.milliseconds() > 810+1000 && loop5){
+//                kickerTwo.setPosition(KICKER_TWO_UP);
+//                loop5 = false;
+//                loop6 = true;
+//            }
+//
+//            if(timerOne.milliseconds() > 1100 +1000&& loop6){
+//                kickerTwo.setPosition(KICKER_TWO_DOWN);
+//                loop6 = false;
+//            }
+//        }
+//        kickThree = true;
+        sleep(250);
+
+
+        frontSweeper.setPower(-1);
+        ChaseTheCarrotConstantHeadingWithShooter(adjustShot, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+        sleep(700);
+        frontSweeper.setPower(0);
+        ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+        sleep(250);
+        timerOne.reset();
+        while (timerOne.milliseconds() < 1275 + 1000) {
+
+            resetCache();
+
+            runShooter(1295);
+            if(kickThree && timerOne.milliseconds() > 1000){
+
+                kickerThree.setPosition(KICKER_THREE_UP);
+
+                kickThree = false;
+                loop2 = true;
+            }
+
+            if(timerOne.milliseconds() > 200+1000 && loop2){
+
+                kickerThree.setPosition(KICKER_THREE_DOWN);
+                loop2 = false;
+                loop3 = true;
+            }
+
+            if(timerOne.milliseconds() > 380+1000 && loop3){
+                kickerOne.setPosition(KICKER_ONE_UP);
+                loop3 = false;
+                loop4 = true;
+            }
+
+            if(timerOne.milliseconds() > 630 +1000&& loop4){
+                kickerOne.setPosition(KICKER_ONE_DOWN);
+                loop4 = false;
+                loop5 = true;
+            }
+
+            if(timerOne.milliseconds() > 810+1000 && loop5){
+                kickerTwo.setPosition(KICKER_TWO_UP);
+                loop5 = false;
+                loop6 = true;
+            }
+
+            if(timerOne.milliseconds() > 1100 +1000&& loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
+                loop6 = false;
+            }
+        }
+        kickThree = true;
+
+        sleep(250);
+        frontSweeper.setPower(-1);
+        ChaseTheCarrotConstantHeadingWithShooter(adjustShot, 9, 3, -28, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+        sleep(500);
+        frontSweeper.setPower(0);
+        ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+        sleep(250);
+        timerOne.reset();
+        while (timerOne.milliseconds() < 1275 + 1000) {
+
+            resetCache();
+
+            runShooter(1295);
+            if(kickThree && timerOne.milliseconds() > 1000){
+
+                kickerThree.setPosition(KICKER_THREE_UP);
+
+                kickThree = false;
+                loop2 = true;
+            }
+
+            if(timerOne.milliseconds() > 200+1000 && loop2){
+
+                kickerThree.setPosition(KICKER_THREE_DOWN);
+                loop2 = false;
+                loop3 = true;
+            }
+
+            if(timerOne.milliseconds() > 380+1000 && loop3){
+                kickerOne.setPosition(KICKER_ONE_UP);
+                loop3 = false;
+                loop4 = true;
+            }
+
+            if(timerOne.milliseconds() > 630 +1000&& loop4){
+                kickerOne.setPosition(KICKER_ONE_DOWN);
+                loop4 = false;
+                loop5 = true;
+            }
+
+            if(timerOne.milliseconds() > 810+1000 && loop5){
+                kickerTwo.setPosition(KICKER_TWO_UP);
+                loop5 = false;
+                loop6 = true;
+            }
+
+            if(timerOne.milliseconds() > 1100 +1000&& loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
+                loop6 = false;
+            }
+        }
+        kickThree = true;
+
+        sleep(250);
+        frontSweeper.setPower(-1);
+        ChaseTheCarrotConstantHeadingWithShooter(bang1, 9, 3, -28, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+        sleep(500);
+        frontSweeper.setPower(0);
+        ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+        sleep(250);
+        timerOne.reset();
+        while (timerOne.milliseconds() < 1275 + 1000) {
+
+            resetCache();
+
+            runShooter(1295);
+            if(kickThree && timerOne.milliseconds() > 1000){
+
+                kickerThree.setPosition(KICKER_THREE_UP);
+
+                kickThree = false;
+                loop2 = true;
+            }
+
+            if(timerOne.milliseconds() > 200+1000 && loop2){
+
+                kickerThree.setPosition(KICKER_THREE_DOWN);
+                loop2 = false;
+                loop3 = true;
+            }
+
+            if(timerOne.milliseconds() > 380+1000 && loop3){
+                kickerOne.setPosition(KICKER_ONE_UP);
+                loop3 = false;
+                loop4 = true;
+            }
+
+            if(timerOne.milliseconds() > 630 +1000&& loop4){
+                kickerOne.setPosition(KICKER_ONE_DOWN);
+                loop4 = false;
+                loop5 = true;
+            }
+
+            if(timerOne.milliseconds() > 810+1000 && loop5){
+                kickerTwo.setPosition(KICKER_TWO_UP);
+                loop5 = false;
+                loop6 = true;
+            }
+
+            if(timerOne.milliseconds() > 1100 +1000&& loop6){
+                kickerTwo.setPosition(KICKER_TWO_DOWN);
+                loop6 = false;
+            }
+        }
+        kickThree = true;
+        sleep(250);
+        ChaseTheCarrotConstantHeadingWithShooter(intakeOne, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+
+
+
+//        ChaseTheCarrotConstantHeadingWithShooter(shot1, 9, 3, 0, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
+
 
 //        hoodOne.setPosition(0.57 );
 //
@@ -878,11 +1073,6 @@ public class FarCycle extends Base{
 //        sleep(500);
 
 
-
-
-
-
-
 //
 //
 //        ChaseTheCarrotConstantHeading(sweepGate, 9, 3, 30, 3, 1, 0.05, 0.05, 0.03, 0.0005, 0, 2500, 1);
@@ -1007,7 +1197,6 @@ public class FarCycle extends Base{
 //THIS IS TRUE END TO GATE AUTO
 
 
-
 ////        kickerThree.setPosition(KICKER_THREE_UP);
 ////        sleep(290);
 ////        kickerThree.setPosition(KICKER_THREE_DOWN);
@@ -1110,12 +1299,6 @@ public class FarCycle extends Base{
 //            }
 //        }
 //        kickThree = true;
-
-
-
-
-
-
 
 
 //
@@ -1274,9 +1457,7 @@ public class FarCycle extends Base{
 //        sleep(500);
 
 
-
-
-
+        }
     }
-}
+
 

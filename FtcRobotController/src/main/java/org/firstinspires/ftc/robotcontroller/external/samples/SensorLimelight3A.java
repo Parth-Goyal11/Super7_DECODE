@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
@@ -40,6 +42,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
@@ -67,14 +70,32 @@ import java.util.List;
  *   below the name of the Limelight on the top level configuration screen.
  */
 @TeleOp(name = "Sensor: Limelight3A", group = "Sensor")
+@Config
 
 public class SensorLimelight3A extends LinearOpMode {
 
     private Limelight3A limelight;
+    FtcDashboard dashboard;
+    private double CAMERA_HEIGHT_CM = 36.871; //
+    private double CAMERA_ANGLE = 8.814;
+    private double GOAL_HEIGHT = 74.95;
+
+    double distance = 0;
+
+
+
+
+
 
     @Override
     public void runOpMode() throws InterruptedException
+
+
     {
+
+        dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         telemetry.setMsTransmissionInterval(11);
@@ -99,13 +120,19 @@ public class SensorLimelight3A extends LinearOpMode {
             telemetry.addData("Pipeline", "Index: %d, Type: %s",
                     status.getPipelineIndex(), status.getPipelineType());
 
+
+
             LLResult result = limelight.getLatestResult();
             if (result.isValid()) {
                 // Access general information
-                Pose3D botpose = result.getBotpose();
+                Pose3D botpose = result.getBotpose_MT2();
+
                 double captureLatency = result.getCaptureLatency();
                 double targetingLatency = result.getTargetingLatency();
                 double parseLatency = result.getParseLatency();
+                distance = getDistance(result.getTy()) / 2.54;
+                dashboardTelemetry.addData("Distance", distance);
+                dashboardTelemetry.update();
                 telemetry.addData("LL Latency", captureLatency + targetingLatency);
                 telemetry.addData("Parse Latency", parseLatency);
                 telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
@@ -115,7 +142,12 @@ public class SensorLimelight3A extends LinearOpMode {
                 telemetry.addData("ty", result.getTy());
                 telemetry.addData("tync", result.getTyNC());
 
+                telemetry.addData("Bot X", Math.round(botpose.getPosition().x * 39.3701 * 100) / 100);
+                telemetry.addData("Bot Y", Math.round(botpose.getPosition().y * 39.3701 * 100) / 100);
+
                 telemetry.addData("Botpose", botpose.toString());
+
+
 
                 // Access barcode results
                 List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
@@ -153,5 +185,12 @@ public class SensorLimelight3A extends LinearOpMode {
             telemetry.update();
         }
         limelight.stop();
+    }
+
+    public double getDistance(double ty){
+        double angleToTarget = CAMERA_ANGLE + ty;
+        double heightDifference = GOAL_HEIGHT - CAMERA_HEIGHT_CM;
+        double preFinal = heightDifference / Math.tan(Math.toRadians(angleToTarget));
+        return preFinal;
     }
 }
